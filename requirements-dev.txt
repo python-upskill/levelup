@@ -1,0 +1,6 @@
+black
+isort
+pycodestyle
+pylint
+pytest
+pytest-cov
