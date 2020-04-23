@@ -7,17 +7,16 @@ Welcom to Python Upskill program!
     ```bash
     git clone git@github.com:radowit/levelup.git
     ```
-2. Create your directory using template, name it with your name or any other fancy name
+2. Create your branch that will be base for all your work
     ```bash
-    cd levelup
-    cp -r _template rganczarek
+    git checkout -b rganczarek
     ```
 3. Create a feature branch for task
     ```bash
     git checkout -b rganczarek/combat
     ```
 4. Develop your solution, commit it and push to remote branch
-5. Create a pull request for your solution
+5. Create a pull request for your solution to your branch (from `rganczarek/combat` to `rganczarek`)
 
 ## How to run your code
 
