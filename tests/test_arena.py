@@ -1,4 +1,4 @@
-from _template import arena
+import arena
 
 
 def test_dummy():
