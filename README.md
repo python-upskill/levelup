@@ -24,7 +24,7 @@ Welcom to Python Upskill program!
 Make sure you have Python 3 [installed in your system](https://realpython.com/installing-python/).
 
 ```bash
-python <yourdirectory>/src/arena.py
+python <yourdirectory>/arena.py
 ```
 
 ## How to check your code
