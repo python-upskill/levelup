@@ -1,0 +1,7 @@
+[run]
+source = .
+omit = .tox/*
+branch=true
+[report]
+show_missing = true
+skip_covered = true
