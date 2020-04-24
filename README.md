@@ -10,6 +10,7 @@ Welcom to Python Upskill program!
 2. Create your branch that will be base for all your work
     ```bash
     git checkout -b rganczarek
+    git push origin rganczarek
     ```
 3. Create a feature branch for task
     ```bash
