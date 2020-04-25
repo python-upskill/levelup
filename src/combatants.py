@@ -2,6 +2,7 @@ import re
 from util import json_operations
 from random import randint
 
+
 class DiceSimulator:
     def encode(self, expr: str):
         prefix_pattern = '(\d+)d(\d+)'
@@ -28,18 +29,35 @@ class DiceSimulator:
         sum = 0
         for _ in range(self.x):
             sum += randint(1, self.y)
-        sum += self.z
-        return sum
+        return sum + self.z
 
 
 class Combatant(object):
     def __init__(self, name: str, hp: int, damage: str):
         self.name = name
-        self.hp = hp
-        self.damage = DiceSimulator().encode(damage).random_result()
+        self.hp_before_attach = hp
+        self.hp_after_attack = hp
+        self.damage_pattern = damage
+
+    def __random_damage(self):
+        return DiceSimulator().encode(self.damage_pattern).random_result()
+
+    def attack(self, other: 'Combatant'):
+        other.hp_before_attach = other.hp_after_attack
+        self.opponent = other
+        other.opponent = self
+        self.damage = self.__random_damage()
+        other.hp_after_attack -= self.damage
+
+    def is_won(self):
+        return hasattr(self, 'opponent') and self.opponent.hp_after_attack <= 0
+
+    def print_round(self, round_number: int):
+        print('{} {} {} {} {} {}'.format(round_number, self.name, self.opponent.name, self.damage,
+                                         self.opponent.hp_before_attach, self.opponent.hp_after_attack))
 
 
-def create_combatants(path):
+def create_combatants(path = '../tasks/combat/combatants.json'):
     elements = json_operations.read_from_file(path)
     result = []
     for e in elements:
@@ -47,4 +65,16 @@ def create_combatants(path):
     return result
 
 
-print(create_combatants('../tasks/combat/combatants.json')[0].damage)
+# print(create_combatants('../tasks/combat/combatants.json')[0].random_damage())
+# print(create_combatants('../tasks/combat/combatants.json')[0])
+# print(create_combatants()[0])
+
+# combatants = create_combatants()
+# c1 = combatants[0]
+# c2 = combatants[1]
+# c1.attack(c2)
+# c1.print_round(1)
+# c1.attack(c2)
+# c1.print_round(2)
+#
+# print('{} - {}'.format(1, 'a'))
