@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Dragon",
+    "hp": 100,
+    "damage": "6d6 + 1"
+  },
+  {
+    "name": "Demogorgon",
+    "hp": 150,
+    "damage": "3d10"
+  }
+]
