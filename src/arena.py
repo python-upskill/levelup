@@ -12,33 +12,39 @@ def create_combatants(path='../tasks/combat/combatants.json'):
 
 
 class Arena:
+    attacker: Combatant
+    opponent: Combatant
+
     def __init__(self):
         combatants = create_combatants()
         self.attacker = combatants[randint(0, 1)]
         combatants.remove(self.attacker)
         self.opponent = combatants[0]
+        self.attacker.opponent = self.opponent
+        self.opponent.opponent = self.attacker
 
-    def get_winner(self):
-        if self.attacker.is_won():
+    def get_winner(self) -> Combatant:
+        if self.attacker.is_winner():
             return self.attacker
-        if self.opponent.is_won():
+        if self.opponent.is_winner():
             return self.opponent
         return None
 
+    def swap_combatants(self) -> None:
+        self.attacker = self.attacker.opponent
+        self.opponent = self.attacker.opponent
+
     def start_battle(self):
-        round_number = 1
-        while True:
+        round_number = 0
+        winner = None
+        while not winner:
+            round_number += 1
             self.attacker.attack(self.opponent)
             self.attacker.print_round(round_number)
-            if self.get_winner():
-                winner = self.get_winner()
-                break
-            round_number += 1
-            self.attacker = self.attacker.opponent
-            self.opponent = self.attacker.opponent
-        print('{} wins in {} rounds!'.format(winner.name, round_number))
+            winner = self.get_winner()
+            self.swap_combatants()
+        print(f'{winner.name} wins in {round_number} rounds!')
 
 
-Arena().start_battle()
-
-WORKS = True
+if __name__ == "__main__":
+    Arena().start_battle()
