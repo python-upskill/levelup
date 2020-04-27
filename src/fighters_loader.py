@@ -20,8 +20,16 @@ class FightersLoader:
 		index = 0
 		for action in json_data["actions"]:
 			if("damage" in action):
-				damage_dice = action["damage"][0]["damage_dice"]
-				damage_bonus = action["damage"][0]["damage_bonus"]
-				fighter = Fighter(name, hp, damage_dice, damage_bonus)
-				return fighter
+				for damage in action["damage"]:
+					if("damage_dice" in damage):
+						damage_dice = damage["damage_dice"]
+						damage_bonus = FightersLoader.extract_fighter_damage_bonus(damage)
+						fighter = Fighter(name, hp, damage_dice, damage_bonus)
+						return fighter
 		raise AttributeError(f"Fighter {name} doesn't have any damage points defined!")
+
+	@staticmethod
+	def extract_fighter_damage_bonus(damage):
+		if("damage_bonus" in damage):
+			return  damage["damage_bonus"]
+		return 0
