@@ -30,7 +30,6 @@ class Combatant(object):
     hp_after_attack: int
     damage: int
     dice_simulator: DiceSimulator
-    opponent: 'Combatant'
 
     def __init__(self, name: str, hp: int, damage: str):
         self.name = name
@@ -46,9 +45,5 @@ class Combatant(object):
         self.damage = self._random_damage()
         other.hp_after_attack -= self.damage
 
-    def is_winner(self) -> bool:
-        return self.opponent.hp_after_attack <= 0
-
-    def print_round(self, round_number: int) -> None:
-        print(f'{round_number} {self.name} {self.opponent.name} {self.damage} '
-              f'{self.opponent.hp_before_attack} {self.opponent.hp_after_attack}')
+    def is_lost(self) -> bool:
+        return self.hp_after_attack <= 0
