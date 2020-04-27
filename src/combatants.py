@@ -3,54 +3,52 @@ from random import randint
 
 
 class DiceSimulator:
-    def encode(self, expr: str):
-        prefix_pattern = r'(\d+)d(\d+)'
-        suffix_pattern = r'\s+\+\s+(\d+)'
-        pattern = prefix_pattern + suffix_pattern
-        x = 0
-        y = 0
-        z = 0
-        if re.match(pattern, expr):
-            z = int(re.search(pattern, expr).group(3))
-        pattern = prefix_pattern
-        if re.match(pattern, expr):
-            x = re.search(pattern, expr).group(1)
-            y = re.search(pattern, expr).group(2)
-        self.__init(int(x), int(y), int(z))
+    rolls_number = 0
+    dice_sides = 0
+    extra_param = 0
+
+    def encode(self, expr: str) -> 'DiceSimulator':
+        matcher = re.search(r'(\d+)d(\d+)(\s+\+\s+(\d+))*', expr)
+        if matcher:
+            self.rolls_number = int(matcher.group(1))
+            self.dice_sides = int(matcher.group(2))
+            extra_param = matcher.group(4)
+            if extra_param:
+                self.extra_param = int(extra_param)
         return self
 
-    def __init(self, x: int, y: int, z: int):
-        self.x = x
-        self.y = y
-        self.z = z
-
-    def random_result(self):
-        sum = 0
-        for _ in range(self.x):
-            sum += randint(1, self.y)
-        return sum + self.z
+    def random_result(self) -> int:
+        result = 0
+        for _ in range(self.rolls_number):
+            result += randint(1, self.dice_sides)
+        return result + self.extra_param
 
 
 class Combatant(object):
+    name: str
+    hp_before_attack: int
+    hp_after_attack: int
+    damage: int
+    dice_simulator: DiceSimulator
+    opponent: 'Combatant'
+
     def __init__(self, name: str, hp: int, damage: str):
         self.name = name
-        self.hp_before_attach = hp
+        self.hp_before_attack = hp
         self.hp_after_attack = hp
-        self.damage_pattern = damage
+        self.dice_simulator = DiceSimulator().encode(damage)
 
-    def __random_damage(self):
-        return DiceSimulator().encode(self.damage_pattern).random_result()
+    def _random_damage(self) -> int:
+        return self.dice_simulator.random_result()
 
-    def attack(self, other: 'Combatant'):
-        other.hp_before_attach = other.hp_after_attack
-        self.opponent = other
-        other.opponent = self
-        self.damage = self.__random_damage()
+    def attack(self, other: 'Combatant') -> None:
+        other.hp_before_attack = other.hp_after_attack
+        self.damage = self._random_damage()
         other.hp_after_attack -= self.damage
 
-    def is_won(self):
-        return hasattr(self, 'opponent') and self.opponent.hp_after_attack <= 0
+    def is_winner(self) -> bool:
+        return self.opponent.hp_after_attack <= 0
 
-    def print_round(self, round_number: int):
-        print('{} {} {} {} {} {}'.format(round_number, self.name, self.opponent.name, self.damage,
-                                         self.opponent.hp_before_attach, self.opponent.hp_after_attack))
+    def print_round(self, round_number: int) -> None:
+        print(f'{round_number} {self.name} {self.opponent.name} {self.damage} '
+              f'{self.opponent.hp_before_attack} {self.opponent.hp_after_attack}')
