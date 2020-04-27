@@ -2,6 +2,7 @@ import json
 import random
 from combatant import Combatant
 
+
 class Arena:
 
     def __init__(self, combatants):

@@ -11,7 +11,8 @@ class Combatant:
     def attack(self, defender: 'Combatant'):
         damage = self.damage.draw_damage()
         defender.deal_a_blow(damage)
-        print(f"{self.name} {defender.name} {damage} {defender.hp + damage} {defender.hp}")
+        print(f"{self.name} {defender.name} {damage} "
+              f"{defender.hp + damage} {defender.hp}")
 
     def deal_a_blow(self, demage: int):
         self.hp -= demage
