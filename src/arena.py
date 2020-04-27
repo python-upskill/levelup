@@ -10,7 +10,7 @@ class Combatant:
         self.damage = Damage(damage)
 
     def attack(self, defender: 'Combatant'):
-        damage = self.damage.draw_demage()
+        damage = self.damage.draw_damage()
         defender.deal_a_blow(damage)
         print(f"{self.name} {defender.name} {damage} {defender.hp + damage} {defender.hp}")
 
@@ -28,7 +28,7 @@ class Damage:
 
     def __init__(self, damage):
         # XdY[ + Z]
-        m = re.search('(\d+)d(\d+)(\[ \+ (\d+)\])*', damage)
+        m = re.search(r"(\d+)d(\d+)(\[ \+ (\d+)\])*", damage)
         if m:
             self.x = int(m.group(1))
             self.y = int(m.group(2))
@@ -36,10 +36,9 @@ class Damage:
             if z:
                 self.z = int(z)
 
-    def draw_demage(self):
-        dice = random.randint(1, self.x)
+    def draw_damage(self):
         result = 0
-        for i in range(dice):
+        for __i in range(self.x):
             result += random.randint(1, self.y)
 
         result += self.z
@@ -64,13 +63,12 @@ class Arena:
 
             if defender.is_dead():
                 print(f"{attacker.name} wins in {round_nr} rounds!")
-                quit()
+                break
             round_nr += 1
 
 
 def combatant_decoder(obj):
     return Combatant(obj['name'], obj['hp'], obj['damage'])
-    return obj
 
 
 def load_combatants():
