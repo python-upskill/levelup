@@ -1,22 +1,22 @@
-from combatants import Combatant
-from util import json_operations
+from combatants import *
 from random import randint
-
-
-def create_combatants(path='../tasks/combat/combatants.json'):
-    elements = json_operations.read_from_file(path)
-    result = []
-    for e in elements:
-        result.append(Combatant(**e))
-    return result
+from io import StringIO
 
 
 class Arena:
     attacker: Combatant
     opponent: Combatant
+    battle_reporter: 'BattleReporter'
+    combatants_retriever = CombatantsRetriever()
 
-    def __init__(self):
-        combatants = create_combatants()
+    def __init__(self, battle_reporter: 'BattleReporter'):
+        self.battle_reporter = battle_reporter
+
+    def retrieve_combatants(self):
+        return self.combatants_retriever.from_file('../tasks/combat/combatants.json')
+
+    def init(self):
+        combatants = self.retrieve_combatants()
         self.attacker = combatants[randint(0, 1)]
         combatants.remove(self.attacker)
         self.opponent = combatants[0]
@@ -33,16 +33,57 @@ class Arena:
               f'{self.opponent.hp_before_attack} {self.opponent.hp_after_attack}')
 
     def start_battle(self):
-        round_number = 0
         winner = None
         while not winner:
-            round_number += 1
             self.attacker.attack(self.opponent)
-            self.print_round(round_number)
+            self.battle_reporter.take_snapshot(self)
             winner = self.get_winner()
             self.attacker, self.opponent = self.opponent, self.attacker
-        print(f'{winner.name} wins in {round_number} rounds!')
+        print(self.battle_reporter.get_summary())
+
+
+class BattleReporter:
+    round_results = []
+
+    def get_incoming_round_number(self):
+        return self.round_results.__len__() + 1
+
+    def take_snapshot(self, arena: Arena) -> None:
+        round_number = self.get_incoming_round_number()
+        self.round_results.append(RoundResult(round_number, arena.attacker,
+                                              arena.opponent))
+
+    def _get_winner(self) -> Combatant:
+        return self.round_results[-1].attacker
+
+    def get_summary(self) -> str:
+        writer = StringIO()
+        for r in self.round_results:
+            writer.write(f'{r.get_description()}\n')
+        rounds_count = self.get_incoming_round_number() - 1
+        writer.write(f'{self._get_winner().name} wins in {rounds_count} rounds!')
+        result = writer.getvalue()
+        writer.close()
+        return result
+
+
+class RoundResult:
+    round_number: int
+    attacker: Combatant
+    opponent: Combatant
+
+    def __init__(self, round_number: int, attacker: Combatant, opponent: Combatant):
+        self.round_number = round_number
+        self.attacker = attacker
+        self.opponent = opponent
+
+    def get_description(self) -> str:
+        return (f'{self.round_number} {self.attacker.name} {self.opponent.name} '
+                f'{self.attacker.damage} {self.opponent.hp_before_attack} '
+                f'{self.opponent.hp_after_attack}')
 
 
 if __name__ == "__main__":
-    Arena().start_battle()
+    arena = Arena(BattleReporter())
+    arena.init()
+    arena.start_battle()
