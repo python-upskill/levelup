@@ -104,7 +104,7 @@ class UrlCombatantRetriever(CombatantsRetriever):
         self.json_retriever.from_url(url)
         return self
 
-    def by_name(self, name: str):
+    def _by_name(self, name: str):
         host = 'https://www.dnd5eapi.co'
         url = f'{host}/api/monsters/?name={name}'
         urls = self.json_retriever.from_url(url).retrieve()
@@ -114,10 +114,11 @@ class UrlCombatantRetriever(CombatantsRetriever):
         self._from_url(f"{host}{urls[0]['results'][0]['url']}")
         return self
 
-    def by_names(self, *names: str):
+    def by_names(self, combatant_names: list):
         self.combatants.clear()
-        for name in names[:2]:
-            self.combatants.append(self.by_name(name)._retrieve_from_json())
+        for name in combatant_names[:2]:
+            combatant_list = self._by_name(name)._retrieve_from_json()
+            self.combatants.append(combatant_list[0])
         return self
 
     def retrieve(self):
