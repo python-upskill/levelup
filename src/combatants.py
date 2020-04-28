@@ -1,6 +1,7 @@
 import re
 from util.json_operations import *
 from random import randint
+from abc import ABC
 
 
 class DiceSimulator:
@@ -49,10 +50,12 @@ class Combatant(object):
     def is_lost(self) -> bool:
         return self.hp_after_attack <= 0
 
+class CombatantsRetriever(ABC):
 
-class CombatantsRetriever:
+    json_retriever: JsonRetriever
 
-    json_retriever = JsonRetriever()
+    def __init__(self, json_retriever: JsonRetriever):
+        self.json_retriever = json_retriever
 
     def _create_combatants(self, json_elements: list):
         result = []
@@ -60,8 +63,15 @@ class CombatantsRetriever:
             result.append(Combatant(**e))
         return result
 
-    def from_file(self, path: str):
-        return self._create_combatants(self.json_retriever.from_file(path))
+    def retrieve(self):
+        return self._create_combatants(self.json_retriever.retrieve())
 
-    def from_url(self, url: str):
-        return self._create_combatants(self.json_retriever.from_url(url))
+
+class FileCombatantRetriever(CombatantsRetriever):
+
+    def __init__(self):
+        super(FileCombatantRetriever, self).__init__(FileJsonRetriever())
+
+    def from_path(self, path: str):
+        self.json_retriever.from_path(path)
+        return self
