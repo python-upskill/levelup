@@ -20,8 +20,3 @@ class Resource(object):
 
 api = falcon.API()
 api.add_route('/battle', Resource())
-
-    # arena = JsonArena()
-    # arena.init()
-    # arena.start_battle()
-    # print(arena.get_summary())
