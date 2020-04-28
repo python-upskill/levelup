@@ -53,7 +53,7 @@ class Arena:
         if winner:
             self.battle_reporter.finish_battle_by_ko(winner.name)
         else:
-            self.battle_reporter.finish_battle(winner.name)
+            self.battle_reporter.finish_battle(self.get_current_winner().name)
 
 
 class JsonArena(Arena):

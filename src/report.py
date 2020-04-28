@@ -1,15 +1,13 @@
 from util import json_operations
 from combatants import *
-from io import StringIO
+from dataclasses import dataclass
 
 
+@dataclass
 class Victory:
-    winner: str
-    rounds: int
-    ko: bool
-
-    def __init__(self):
-        self.ko = False
+    winner: str = None
+    rounds: int = None
+    ko: bool = False
 
 
 class BattleReporter:
@@ -19,9 +17,6 @@ class BattleReporter:
     def __init__(self):
         self.rounds = []
         self.victory = Victory()
-
-    def get_incoming_round_number(self):
-        return self.rounds.__len__() + 1
 
     def get_finished_rounds_count(self):
         return self.rounds.__len__()
@@ -34,14 +29,7 @@ class BattleReporter:
         return self.rounds[-1].attacker
 
     def get_summary(self) -> str:
-        writer = StringIO()
-        for r in self.rounds:
-            writer.write(f'{r.get_description()}\n')
-        rounds_count = self.get_finished_rounds_count()
-        writer.write(f'{self._get_winner()} wins in {rounds_count} rounds!')
-        result = writer.getvalue()
-        writer.close()
-        return result
+        return "\n".join(list(map(lambda r: r.get_description(), self.rounds)))
 
     def finish_battle(self, winner_name: str):
         self.victory.winner = winner_name
