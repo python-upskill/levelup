@@ -1,10 +1,11 @@
-import json
+import jsonpickle
 
 
 class Victory:
     winner: str
     round: int
     ko: bool
+
 
     def __init__(self,
                  winner: str,
@@ -38,13 +39,14 @@ class RoundResult:
 
 
 class BattleResult:
-    rounds = [2, 3]
+    rounds: list
     victory: Victory
+
+    def __init__(self):
+        self.rounds = list()
 
     def add_round(self, battle_round: RoundResult):
         self.rounds.append(battle_round)
 
-    # FIXME rounds not serialized!!!
     def to_json(self):
-        return json.dumps(self, default=lambda o: o.__dict__,
-                          sort_keys=True, indent=4)
+        return jsonpickle.encode(self, unpicklable=False)
