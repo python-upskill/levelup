@@ -38,6 +38,10 @@ Implement more custom filtering options to your APIs:
 
 Also - add pagination to your API.
 
+### Monster CRUD
+
+Add support to POST/PATCH/PUT/DELETE methods to monster API to allow managing custom monsters.
+
 ### Docker
 
 Contenerize your application with PostgreSQL or MySQL database container.
