@@ -1,7 +1,10 @@
 import json
 import re
 import random
+import falcon
+from wsgiref import simple_server
 from typing import List
+from json import JSONEncoder
 
 
 class Damage:
@@ -122,8 +125,12 @@ class Arena:
             self.c1, self.c2 = self.c2, self.c1
             round_number += 1
         else:
-            print('{0} won!'.format(self.c2.name))
-            victory = Victory(self.c2.name, round_number - 1, self.c1.is_dead())
+            if self.c1.health > self.c2.health:
+                print('{0} won!'.format(self.c1.name))
+                victory = Victory(self.c1.name, round_number - 1, self.c2.is_dead())
+            else:
+                print('{0} won!'.format(self.c2.name))
+                victory = Victory(self.c2.name, round_number - 1, self.c1.is_dead())
         return Result(rounds, victory)
 
     @staticmethod
@@ -154,10 +161,27 @@ def combatant_decoder(obj) -> Combatant:
     return Combatant(str(obj['name']), int(obj['hp']), Damage(str(obj['damage'])))
 
 
-def main():
+def main() -> Result:
     combatants: Combatants = load_combatants()
-    Arena(combatants[0], combatants[1], 10).fight()
+    return Arena(combatants[0], combatants[1], 10).fight()
 
+
+class MyEncoder(JSONEncoder):
+    def default(self, o):
+        return o.__dict__
+
+
+class ThingsResource(object):
+
+    def on_post(self, req, resp):
+        resp.status = falcon.HTTP_200
+        result: Result = main()
+        resp.body = json.dumps(result, cls=MyEncoder)
+
+
+app = falcon.API()
+app.add_route('/fight', ThingsResource())
 
 if __name__ == "__main__":
-    main()
+    httpd = simple_server.make_server('127.0.0.1', 7011, app)
+    httpd.serve_forever()
