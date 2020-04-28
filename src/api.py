@@ -3,7 +3,7 @@ import json
 from arena import JsonArena
 
 
-class Resource(object):
+class CombatantResource:
 
     def on_get(self, req, resp):
         arena = JsonArena()
@@ -19,4 +19,4 @@ class Resource(object):
 
 
 api = falcon.API()
-api.add_route('/battle', Resource())
+api.add_route('/battle', CombatantResource())
