@@ -1,21 +1,16 @@
 import jsonpickle
+from combatant import Combatant
+from dataclasses import dataclass
 
 
+@dataclass
 class Victory:
     winner: str
     round: int
     ko: bool
 
 
-    def __init__(self,
-                 winner: str,
-                 round: int,
-                 ko: bool):
-        self.winner = winner
-        self.round = round
-        self.ko = ko
-
-
+@dataclass
 class RoundResult:
     round_number: int
     attacker: str
@@ -24,23 +19,9 @@ class RoundResult:
     previous_hp: int
     current_hp: int
 
-    def __init__(self, round_number: int,
-                 attacker: str,
-                 defender: str,
-                 damage: int,
-                 previous_hp: int,
-                 current_hp: int):
-        self.round_number = round_number
-        self.attacker = attacker
-        self.defender = defender
-        self.damage = damage
-        self.previous_hp = previous_hp
-        self.current_hp = current_hp
-
 
 class BattleResult:
     rounds: list
-    victory: Victory
 
     def __init__(self):
         self.rounds = list()
@@ -50,3 +31,19 @@ class BattleResult:
 
     def to_json(self):
         return jsonpickle.encode(self, unpicklable=False)
+
+
+@dataclass
+class Round:
+    round_nr: int
+    attacker: Combatant
+    defender: Combatant
+    damage: int
+
+    def round_result(self) -> RoundResult:
+        return RoundResult(self.round_nr,
+                           self.attacker.name,
+                           self.defender.name,
+                           self.damage,
+                           self.defender.hp + self.damage,
+                           self.defender.hp)
