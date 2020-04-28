@@ -18,6 +18,7 @@ class FightClubDbService:
 	}
 
 	round_parameters_map = {
+		'fight_id': Round.fight_id,
 		'round_nr': Round.round_nr,
 		'attacker': Round.attacker,
 		'defender': Round.defender,
@@ -50,7 +51,9 @@ class FightClubDbService:
 					f" Following attributes are allowed: {', '.join(FightClubDbService.fighter_parameters_map)}")
 			if key is not None and value is not None:
 				predicates.append((FightClubDbService.fighter_parameters_map[key]==value))
-		query = (Fighter.select().where(reduce(operator.and_, predicates)))
+		query = (Round.select())
+		if len(predicates):
+			query = (query.where(reduce(operator.and_, predicates)))
 		fighters = []
 		for fighter in query:
 			fighters.append(fighter)
@@ -65,7 +68,9 @@ class FightClubDbService:
 					f" Following attributes are allowed: {', '.join(FightClubDbService.fight_parameters_map)}")
 			if key is not None and value is not None:
 				predicates.append((FightClubDbService.fight_parameters_map[key]==value))
-		query = (Fight.select().where(reduce(operator.and_, predicates)))
+		query = (Round.select())
+		if len(predicates):
+			query = (query.where(reduce(operator.and_, predicates)))
 		fights = []
 		for fight in query:
 			fights.append(fight)
@@ -80,7 +85,9 @@ class FightClubDbService:
 					f" Following attributes are allowed: {', '.join(FightClubDbService.round_parameters_map)}")
 			if key is not None and value is not None:
 				predicates.append((FightClubDbService.round_parameters_map[key]==value))
-		query = (Round.select().where(reduce(operator.and_, predicates)))
+		query = (Round.select())
+		if len(predicates):
+			query = (query.where(reduce(operator.and_, predicates)))
 		rounds = []
 		for round in query:
 			rounds.append(round)
