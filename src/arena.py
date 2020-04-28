@@ -1,13 +1,14 @@
 import json
-import re
 import random
+import re
+import requests
+from json import JSONEncoder
+from typing import List
+from wsgiref import simple_server
+import marshmallow_dataclass
 
 import falcon
-from wsgiref import simple_server
-from typing import List
-from json import JSONEncoder
-
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 class Combatant:
@@ -121,35 +122,49 @@ class Arena:
             ko: bool
 
 
-def load_combatants() -> Combatants:
-    with open('../tasks/combat/combatants.json') as f:
-        combatants = json.load(f, object_hook=combatant_decoder)
-    return combatants
+class CombatantsLoader:
+
+    def load_combatants(self, combatant_1_name: str, combatant_2_name: str) -> Combatants:
+        return [self.__load_combatant(combatant_1_name), self.__load_combatant(combatant_2_name)]
+
+    def __load_combatant(self, combatant_name: str) -> Combatants:
+        response: requests.Response = requests.get("https://www.dnd5eapi.co/api/monsters/" + combatant_name)
+        if not response.ok:
+            raise AttributeError(f"Combatant {combatant_name} not found!")
+        monster: 'Monster' = marshmallow_dataclass.class_schema('Monster').loads(json.load(response.content))
+        damage: 'Monster.Action.Damage' = next(i for i in len(monster.actions)
+                                        if monster.actions[i].damage.damage_dice is not None)
+        return Combatant(combatant_name, monster.hit_points, damage.damage_dice)
+
+    @dataclass
+    class Monster:
+        hit_points: int = field()
+        actions: List['Monster.Action']
+
+        @dataclass
+        class Action:
+            damage: 'Damage'
+
+            @dataclass
+            class Damage:
+                damage_dice: str
+                damage_bonus: str
 
 
-def combatant_decoder(obj) -> Combatant:
-    return Combatant(str(obj['name']), int(obj['hp']), str(obj['damage']))
-
-
-def main() -> Arena.BattleResult:
-    combatants: Combatants = load_combatants()
-    return Arena(combatants[0], combatants[1], 10).fight()
-
-
-class MyEncoder(JSONEncoder):
-    def default(self, o):
-        return o.__dict__
-
-
-class ThingsResource(object):
+class ArenaResource:
 
     def on_post(self, req, resp):
         resp.status = falcon.HTTP_200
-        resp.body = json.dumps(main(), cls=MyEncoder)
+        combatants: Combatants = CombatantsLoader().load_combatants("orc", "orc")
+        resp.body = json.dumps(Arena(combatants[0], combatants[1], 10).fight(), cls=self.BattleResultEncoder)
+
+    class BattleResultEncoder(JSONEncoder):
+        def default(self, o):
+            return o.__dict__
 
 
 app = falcon.API()
-app.add_route('/fight', ThingsResource())
+app.add_route('/fight', ArenaResource())
 
 if __name__ == "__main__":
     httpd = simple_server.make_server('127.0.0.1', 7011, app)
