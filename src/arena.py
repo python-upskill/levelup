@@ -131,14 +131,14 @@ class CombatantsLoader:
         response: requests.Response = requests.get("https://www.dnd5eapi.co/api/monsters/" + combatant_name)
         if not response.ok:
             raise AttributeError(f"Combatant {combatant_name} not found!")
-        monster: 'Monster' = marshmallow_dataclass.class_schema('Monster').loads(json.load(response.content))
+        monster: 'Monster' = marshmallow_dataclass.class_schema(self.Monster).load(json.load(response.content))
         damage: 'Monster.Action.Damage' = next(i for i in len(monster.actions)
                                         if monster.actions[i].damage.damage_dice is not None)
         return Combatant(combatant_name, monster.hit_points, damage.damage_dice)
 
     @dataclass
     class Monster:
-        hit_points: int = field()
+        hit_points: int
         actions: List['Monster.Action']
 
         @dataclass
