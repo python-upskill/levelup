@@ -9,7 +9,8 @@ class Arena:
     combatants_retriever = CombatantsRetriever()
     max_rounds: int
 
-    def __init__(self, battle_reporter: 'BattleReporter', max_rounds: int = None):
+    def __init__(self, battle_reporter: 'BattleReporter' = BattleReporter(),
+                 max_rounds: int = None):
         self.battle_reporter = battle_reporter
         self.max_rounds = max_rounds
 
@@ -61,9 +62,7 @@ class JsonArena(Arena):
 
 
 if __name__ == "__main__":
-    # arena = Arena(BattleReporter())
-    # arena = Arena(JsonBattleReporter())
-    arena = JsonArena()
+    arena = Arena()
     arena.init()
     arena.start_battle()
     print(arena.get_summary())
