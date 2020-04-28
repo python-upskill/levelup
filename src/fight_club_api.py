@@ -1,6 +1,8 @@
 import json, falcon, jsonpickle
 from fighters_loader import FightersLoader
 from fight_club import FightClub
+from fight_club_db_service import FightClubDbService
+from peewee import *
 
 WORKS = True
 
@@ -9,22 +11,26 @@ class FightClubApi:
     def on_post(self, req, resp):
         resp.content_type = 'application/json'
         data = json.loads(req.stream.read())
-        fighters_names = data['combatants']
+        fighters_indexes = data['combatants']
         max_rounds_number = int(data['max_rounds'])
         try:
-            fighters = self.__load_fighters(fighters_names)
+            fighters = self.__load_fighters(fighters_indexes)
         except AttributeError as err:
             resp.status = falcon.HTTP_400
             resp.body = json.dumps({'error': [err.args]}) 
             return
         fight_result = self.__fight(fighters, max_rounds_number)
+        FightClubDbService.save_fight_result(fight_result)
         resp.status = falcon.HTTP_200
         resp.body = jsonpickle.encode(fight_result, unpicklable=False)
 
-    def __load_fighters(self, fighters_names):
+    def __load_fighters(self, fighters_indexes):
         fighters = []
-        for name in fighters_names:
-            fighter = FightersLoader.load_fighter(name)
+        for index in fighters_indexes:
+            fighter = FightClubDbService.find_fighter_by_index(index)
+            if(fighter is None):
+                fighter = FightersLoader.load_fighter(index)
+                FightClubDbService.save_fighter(index, fighter)
             fighters.append(fighter)
         return fighters
 
@@ -33,6 +39,40 @@ class FightClubApi:
         fight_result = fight_club.fight(fighters, max_rounds_number)
         return fight_result
 
-api = falcon.API()
+    def on_get(self, req, resp):
+        try:
+            fights = FightClubDbService.find_fights_by_params(req.params.items())
+            resp.content_type = 'application/json'
+            resp.body = jsonpickle.encode(fights, unpicklable=False)
+        except AttributeError as err:
+            resp.status = falcon.HTTP_400
+            resp.body = json.dumps({'error': [err.args]}) 
+            return
 
-api.add_route('/fight', FightClubApi())
+    def on_get_fighter(self, req, resp):
+        try:
+            fighters = FightClubDbService.find_fighters_by_params(req.params.items())
+            resp.content_type = 'application/json'
+            resp.body = jsonpickle.encode(fighters, unpicklable=False)
+        except AttributeError as err:
+            resp.status = falcon.HTTP_400
+            resp.body = json.dumps({'error': [err.args]}) 
+            return
+
+    def on_get_round(self, req, resp):
+        try:
+            rounds = FightClubDbService.find_rounds_by_params(req.params.items())
+            resp.content_type = 'application/json'
+            resp.body = jsonpickle.encode(rounds, unpicklable=False)
+        except AttributeError as err:
+            resp.status = falcon.HTTP_400
+            resp.body = json.dumps({'error': [err.args]}) 
+            return
+
+api = falcon.API()
+resource = FightClubApi()
+
+api.add_route('/fight', resource)
+api.add_route('/fight', resource)
+api.add_route('/fighter', resource, suffix='fighter')
+api.add_route('/round', resource, suffix='round')
