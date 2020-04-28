@@ -67,8 +67,11 @@ class CombatantsRetriever(ABC):
     def _retrieve_json(self) -> list:
         return self.json_retriever.retrieve()
 
-    def retrieve(self):
+    def _retrieve_from_json(self):
         return self._create_combatants(self._retrieve_json())
+
+    def retrieve(self):
+        return self._retrieve_from_json()
 
 
 class FileCombatantRetriever(CombatantsRetriever):
@@ -85,19 +88,41 @@ class UrlCombatantRetriever(CombatantsRetriever):
 
     def __init__(self):
         super(UrlCombatantRetriever, self).__init__(UrlJsonRetriever())
+        self.combatants: list = []
 
     def _retrieve_json(self) -> list:
         js = super()._retrieve_json()[0]
-        data = {}
-        data['name'] = js['name']
-        data['hp'] = js['hit_points']
+        data = {'name': js['name'], 'hp': js['hit_points']}
         for action in js['actions']:
-            damage = action['damage']
-            if damage:
-                data['damage'] = damage[0]['damage_dice']
-                break
+            if 'damage' not in action:
+                continue
+            data['damage'] = action['damage'][0]['damage_dice']
+            break
         return [data]
 
-    def from_url(self, url: str):
+    def _from_url(self, url: str):
         self.json_retriever.from_url(url)
         return self
+
+    def by_name(self, name: str):
+        host = 'https://www.dnd5eapi.co'
+        url = f'{host}/api/monsters/?name={name}'
+        urls = self.json_retriever.from_url(url).retrieve()
+        if urls[0]['count'] == 0:
+            msg = f"Combatant named '{name}' not found"
+            raise CombatantNotFoundException(msg)
+        self._from_url(f"{host}{urls[0]['results'][0]['url']}")
+        return self
+
+    def by_names(self, *names: str):
+        self.combatants.clear()
+        for name in names[:2]:
+            self.combatants.append(self.by_name(name)._retrieve_from_json())
+        return self
+
+    def retrieve(self):
+        return self.combatants
+
+
+class CombatantNotFoundException(Exception):
+    pass
