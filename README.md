@@ -46,3 +46,9 @@ tox
 - [Full stack Python](https://www.fullstackpython.com/)
 - [Practical Python tutorial](https://www.hackerrank.com/domains/python)
 
+### Curiosities
+
+- [Python easter eggs](https://github.com/OrkoHunter/python-easter-eggs)
+- ["Hidden features of Python"](https://stackoverflow.com/questions/101268/hidden-features-of-python)
+- [Python humor](https://www.python.org/doc/humor/)
+- [Python memes](https://www.google.com/search?q=python+programming+memes&tbm=isch)     
