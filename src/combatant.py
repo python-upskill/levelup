@@ -11,7 +11,8 @@ class Combatant:
     def attack(self, defender: 'Combatant'):
         damage = self.damage.draw_damage()
         defender.deal_a_blow(damage)
-        print(f"{self.name} {defender.name} {damage} {defender.hp + damage} {defender.hp}")
+        print(f"{self.name} {defender.name} {damage} "
+              f"{defender.hp + damage} {defender.hp}")
 
     def deal_a_blow(self, demage: int):
         self.hp -= demage
@@ -35,7 +36,7 @@ class Damage:
             if z:
                 self.z = int(z)
 
-    def draw_damage(self):
+    def draw_damage(self) -> int:
         result = 0
         for __i in range(self.x):
             result += random.randint(1, self.y)
