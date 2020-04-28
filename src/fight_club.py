@@ -1,7 +1,6 @@
 import json
 from random import randint
-
-WORKS = True
+from dataclasses import dataclass
 
 class FightClub:
 	def __calculate_damage_dice(self, damage_dice_pattern):
@@ -19,18 +18,25 @@ class FightClub:
 		return damage
 
 	def __sum_up_fight(self, fighters, round_number):
-		winner = fighters[0] if fighters[0].hp > fighters[1].hp else fighters[1]
-		fighters.remove(winner)
-		defender = fighters[0]
-		ko = defender.hp <= 0;
+		fighters = sorted(fighters, key=lambda fighter: fighter.hp)
+		winner = fighters[-1]
+		loser = fighters[0]
+		ko = loser.hp <= 0;
 		victory = Victory(winner.name, round_number, ko)
 		return victory
 
+	def draw_fighters_slots(self, fighters):
+		first_fighter = fighters[randint(0, 1)]
+		fighters.remove(first_fighter)
+		second_fighter = fighters[0]
+		fighters_with_drawed_slots = [first_fighter, second_fighter]
+		return fighters_with_drawed_slots
 
-	def fight(self, fighters, max_rounds_number):
+	def fight(self, fighters_list: list, max_rounds_number: int) -> 'FightResult':
 		round_number = 1
 		rounds_summary_list = []
-		while fighters[0].hp > 0 and fighters[1].hp > 0 and round_number <= max_rounds_number:
+		fighters = self.draw_fighters_slots(fighters_list)
+		while all(f.hp > 0 for f in fighters) and round_number <= max_rounds_number:
 			attacker = fighters[round_number % 2]
 			defender = fighters[(round_number + 1) % 2]
 			damage = self.__calculate_damage(attacker)
@@ -45,30 +51,30 @@ class FightClub:
 		fight_result = FightResult(rounds_summary_list, victory)
 		return fight_result
 
+@dataclass
 class Fighter:
-	def __init__(self, name: str, hp: int, damage_dice: str, damage_bonus: int):
-		self.name = name
-		self.hp = hp
-		self.damage_dice = damage_dice
-		self.damage_bonus = damage_bonus
+	name: str
+	hp: int
+	damage_dice: str
+	damage_bonus: int
 
+@dataclass
 class FightResult:
-	def __init__(self, rounds: list, victory: object):
-		self.rounds = rounds
-		self.victory = victory
+	rounds: list
+	victory: object
 
+@dataclass
 class Victory:
-	def __init__(self, winner_name: str, rounds_number: int, ko: bool):
-		self.winner_name = winner_name
-		self.rounds_number = rounds_number
-		self.ko = ko
+	winner_name: str
+	rounds_number: int
+	ko: bool
 
+@dataclass
 class RoundSummary:
-	def __init__(self, round_number: int, attacker: str, defender: str, damage: int, previous_hp: int, current_hp: int):
-		self.round_number = round_number
-		self.attacker = attacker
-		self.defender = defender
-		self.damage = damage
-		self.previous_hp = previous_hp
-		self.current_hp = current_hp
+	round_number: int
+	attacker: str
+	defender: str
+	damage: int
+	previous_hp: int
+	current_hp: int
 

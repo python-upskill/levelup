@@ -1,8 +1,6 @@
 import requests
 from fight_club import Fighter
 
-WORKS = True
-
 class FightersLoader:
 	@staticmethod
 	def load_fighter(name):
@@ -13,8 +11,8 @@ class FightersLoader:
 		fighter = FightersLoader.extract_fighter_details(json_data)
 		return fighter
 
-	@staticmethod
-	def extract_fighter_details(json_data):
+	@classmethod
+	def extract_fighter_details(cls, json_data):
 		name = json_data["name"]
 		hp = json_data["hit_points"]
 		index = 0
@@ -28,8 +26,8 @@ class FightersLoader:
 						return fighter
 		raise AttributeError(f"Fighter {name} doesn't have any damage points defined!")
 
-	@staticmethod
-	def extract_fighter_damage_bonus(damage):
+	@classmethod
+	def extract_fighter_damage_bonus(cls, damage):
 		if("damage_bonus" in damage):
 			return  damage["damage_bonus"]
 		return 0
