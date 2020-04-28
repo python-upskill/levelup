@@ -6,7 +6,7 @@ class Arena:
     attacker: Combatant
     opponent: Combatant
     battle_reporter: 'BattleReporter'
-    combatants_retriever = CombatantsRetriever()
+    combatants_retriever = FileCombatantRetriever()
     max_rounds: int
 
     def __init__(self, battle_reporter: 'BattleReporter' = BattleReporter(),
@@ -15,7 +15,9 @@ class Arena:
         self.max_rounds = max_rounds
 
     def retrieve_combatants(self):
-        return self.combatants_retriever.from_file('../tasks/combat/combatants.json')
+        return self.combatants_retriever\
+            .from_path('../tasks/combat/combatants.json')\
+            .retrieve()
 
     def init(self):
         combatants = self.retrieve_combatants()
