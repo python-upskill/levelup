@@ -1,5 +1,7 @@
 import re
+from util.json_operations import *
 from random import randint
+from abc import ABC
 
 
 class DiceSimulator:
@@ -47,3 +49,81 @@ class Combatant(object):
 
     def is_lost(self) -> bool:
         return self.hp_after_attack <= 0
+
+
+class CombatantsRetriever(ABC):
+
+    json_retriever: JsonRetriever
+
+    def __init__(self, json_retriever: JsonRetriever):
+        self.json_retriever = json_retriever
+
+    def _create_combatants(self, json_elements: list):
+        result = []
+        for e in json_elements:
+            result.append(Combatant(**e))
+        return result
+
+    def _retrieve_json(self) -> list:
+        return self.json_retriever.retrieve()
+
+    def _retrieve_from_json(self):
+        return self._create_combatants(self._retrieve_json())
+
+    def retrieve(self):
+        return self._retrieve_from_json()
+
+
+class FileCombatantRetriever(CombatantsRetriever):
+
+    def __init__(self):
+        super(FileCombatantRetriever, self).__init__(FileJsonRetriever())
+
+    def from_path(self, path: str):
+        self.json_retriever.from_path(path)
+        return self
+
+
+class UrlCombatantRetriever(CombatantsRetriever):
+
+    def __init__(self):
+        super(UrlCombatantRetriever, self).__init__(UrlJsonRetriever())
+        self.combatants: list = []
+
+    def _retrieve_json(self) -> list:
+        js = super()._retrieve_json()[0]
+        data = {'name': js['name'], 'hp': js['hit_points']}
+        for action in js['actions']:
+            if 'damage' not in action:
+                continue
+            data['damage'] = action['damage'][0]['damage_dice']
+            break
+        return [data]
+
+    def _from_url(self, url: str):
+        self.json_retriever.from_url(url)
+        return self
+
+    def _by_name(self, name: str):
+        host = 'https://www.dnd5eapi.co'
+        url = f'{host}/api/monsters/?name={name}'
+        urls = self.json_retriever.from_url(url).retrieve()
+        if urls[0]['count'] == 0:
+            msg = f"Combatant named '{name}' not found"
+            raise CombatantNotFoundException(msg)
+        self._from_url(f"{host}{urls[0]['results'][0]['url']}")
+        return self
+
+    def by_names(self, combatant_names: list):
+        self.combatants.clear()
+        for name in combatant_names[:2]:
+            combatant_list = self._by_name(name)._retrieve_from_json()
+            self.combatants.append(combatant_list[0])
+        return self
+
+    def retrieve(self):
+        return self.combatants
+
+
+class CombatantNotFoundException(Exception):
+    pass

@@ -1,22 +1,25 @@
-from combatants import Combatant
-from util import json_operations
+from report import *
 from random import randint
-
-
-def create_combatants(path='../tasks/combat/combatants.json'):
-    elements = json_operations.read_from_file(path)
-    result = []
-    for e in elements:
-        result.append(Combatant(**e))
-    return result
 
 
 class Arena:
     attacker: Combatant
     opponent: Combatant
+    battle_reporter: 'BattleReporter'
+    max_rounds: int
 
-    def __init__(self):
-        combatants = create_combatants()
+    def __init__(self, battle_reporter: 'BattleReporter' = BattleReporter(),
+                 max_rounds: int = None):
+        self.battle_reporter = battle_reporter
+        self.max_rounds = max_rounds
+
+    def retrieve_combatants(self):
+        return FileCombatantRetriever()\
+            .from_path('../tasks/combat/combatants.json')\
+            .retrieve()
+
+    def init(self):
+        combatants = self.retrieve_combatants()
         self.attacker = combatants[randint(0, 1)]
         combatants.remove(self.attacker)
         self.opponent = combatants[0]
@@ -28,21 +31,51 @@ class Arena:
             return self.attacker
         return None
 
-    def print_round(self, round_number: int) -> None:
-        print(f'{round_number} {self.attacker.name} {self.opponent.name} {self.attacker.damage} '
-              f'{self.opponent.hp_before_attack} {self.opponent.hp_after_attack}')
+    def get_current_winner(self) -> Combatant:
+        if self.attacker.hp_after_attack >= self.opponent.hp_after_attack:
+            return self.attacker
+        return self.opponent
 
-    def start_battle(self):
-        round_number = 0
+    def get_summary(self) -> str:
+        return self.battle_reporter.get_summary()
+
+    def is_finished_by_round_nr(self, round_nr: int) -> bool:
+        return self.max_rounds and round_nr > self.max_rounds
+
+    def start_battle(self) -> None:
+        round_nr = 1
         winner = None
-        while not winner:
-            round_number += 1
+        while not self.is_finished_by_round_nr(round_nr) and not winner:
             self.attacker.attack(self.opponent)
-            self.print_round(round_number)
+            self.battle_reporter.take_snapshot(self.attacker, self.opponent)
             winner = self.get_winner()
+            round_nr += 1
             self.attacker, self.opponent = self.opponent, self.attacker
-        print(f'{winner.name} wins in {round_number} rounds!')
+        if winner:
+            self.battle_reporter.finish_battle_by_ko(winner.name)
+        else:
+            self.battle_reporter.finish_battle(self.get_current_winner().name)
+
+
+class JsonArena(Arena):
+    combatant_names: list
+
+    def __init__(self, max_rounds: int = None):
+        super(JsonArena, self).__init__(battle_reporter=JsonBattleReporter(),
+                                        max_rounds=max_rounds)
+
+    def init_by_names(self, combatant_names: list):
+        self.combatant_names = combatant_names
+        super().init()
+
+    def retrieve_combatants(self):
+        return UrlCombatantRetriever()\
+            .by_names(self.combatant_names)\
+            .retrieve()
 
 
 if __name__ == "__main__":
-    Arena().start_battle()
+    arena = Arena()
+    arena.init()
+    arena.start_battle()
+    print(arena.get_summary())
