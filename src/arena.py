@@ -6,7 +6,6 @@ class Arena:
     attacker: Combatant
     opponent: Combatant
     battle_reporter: 'BattleReporter'
-    combatants_retriever = FileCombatantRetriever()
     max_rounds: int
 
     def __init__(self, battle_reporter: 'BattleReporter' = BattleReporter(),
@@ -15,7 +14,7 @@ class Arena:
         self.max_rounds = max_rounds
 
     def retrieve_combatants(self):
-        return self.combatants_retriever\
+        return FileCombatantRetriever()\
             .from_path('../tasks/combat/combatants.json')\
             .retrieve()
 
@@ -59,8 +58,20 @@ class Arena:
 
 
 class JsonArena(Arena):
-    def __init__(self):
-        super(JsonArena, self).__init__(JsonBattleReporter())
+    combatant_names: list
+
+    def __init__(self, max_rounds: int = None):
+        super(JsonArena, self).__init__(battle_reporter=JsonBattleReporter(),
+                                        max_rounds=max_rounds)
+
+    def init_by_names(self, combatant_names: list):
+        self.combatant_names = combatant_names
+        super().init()
+
+    def retrieve_combatants(self):
+        return UrlCombatantRetriever()\
+            .by_names(self.combatant_names)\
+            .retrieve()
 
 
 if __name__ == "__main__":
