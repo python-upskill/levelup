@@ -12,12 +12,13 @@ class CombatantResource:
         arena = JsonArena(max_rounds=int(raw_data['max_rounds']))
         try:
             arena.init_by_names(raw_data['combatants'])
-            arena.start_battle()
-            resp.body = arena.get_summary()
-            resp.status = falcon.HTTP_200
         except CombatantNotFoundException as e:
             resp.body = toJSON({'error': str(e)})
             resp.status = falcon.HTTP_400
+            return
+        arena.start_battle()
+        resp.body = arena.get_summary()
+        resp.status = falcon.HTTP_200
 
 
 api = falcon.API()

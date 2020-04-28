@@ -25,9 +25,6 @@ class BattleReporter:
         incoming_round_nr = self.get_finished_rounds_count() + 1
         self.rounds.append(RoundResult(incoming_round_nr, attacker, opponent))
 
-    def _get_winner(self) -> Combatant:
-        return self.rounds[-1].attacker
-
     def get_summary(self) -> str:
         return "\n".join(list(map(lambda r: r.get_description(), self.rounds)))
 
