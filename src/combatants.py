@@ -50,6 +50,7 @@ class Combatant(object):
     def is_lost(self) -> bool:
         return self.hp_after_attack <= 0
 
+
 class CombatantsRetriever(ABC):
 
     json_retriever: JsonRetriever
@@ -63,8 +64,11 @@ class CombatantsRetriever(ABC):
             result.append(Combatant(**e))
         return result
 
+    def _retrieve_json(self) -> list:
+        return self.json_retriever.retrieve()
+
     def retrieve(self):
-        return self._create_combatants(self.json_retriever.retrieve())
+        return self._create_combatants(self._retrieve_json())
 
 
 class FileCombatantRetriever(CombatantsRetriever):
@@ -74,4 +78,26 @@ class FileCombatantRetriever(CombatantsRetriever):
 
     def from_path(self, path: str):
         self.json_retriever.from_path(path)
+        return self
+
+
+class UrlCombatantRetriever(CombatantsRetriever):
+
+    def __init__(self):
+        super(UrlCombatantRetriever, self).__init__(UrlJsonRetriever())
+
+    def _retrieve_json(self) -> list:
+        js = super()._retrieve_json()[0]
+        data = {}
+        data['name'] = js['name']
+        data['hp'] = js['hit_points']
+        for action in js['actions']:
+            damage = action['damage']
+            if damage:
+                data['damage'] = damage[0]['damage_dice']
+                break
+        return [data]
+
+    def from_url(self, url: str):
+        self.json_retriever.from_url(url)
         return self

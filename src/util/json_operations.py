@@ -38,7 +38,15 @@ class UrlJsonRetriever(JsonRetriever):
         return self
 
     def _retrieve_json(self):
-        return json.load(requests.get(self.url))
+        resp = requests.get(self.url)
+        if resp.status_code == 200:
+            return resp.json()
+        msg = f'{self.url} not found'
+        raise ResourceNotFoundException(msg)
+
+
+class ResourceNotFoundException(Exception):
+    pass
 
 
 def toJSON(obj):
