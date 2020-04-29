@@ -21,7 +21,8 @@ class RoundResult:
 
 
 class BattleResult:
-    rounds: list
+    rounds = [RoundResult]
+    victory: Victory
 
     def __init__(self):
         self.rounds = list()

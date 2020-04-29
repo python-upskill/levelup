@@ -1,5 +1,6 @@
 from arena import *
 from battle_request import *
+from battle_repository import *
 import falcon
 import json
 
@@ -16,6 +17,7 @@ class ArenaResource(object):
 
         arena = Arena(battle_request)
         battle_result: BattleResult = arena.fight()
+        BattleRepository.save_battle(battle_result)
 
         resp.status = falcon.HTTP_200
         resp.body = battle_result.to_json()
@@ -27,6 +29,15 @@ class ArenaResource(object):
         return BattleRequest(combatants, max_rounds)
 
 
+class BattleResource(object):
+
+    def on_get(self, req, resp):
+        resp.status = falcon.HTTP_200
+        resp.body = jsonpickle.encode(BattleRepository.find_all(),
+                                      unpicklable=False)
+
+
 app = falcon.API()
 
-app.add_route('/arena/fight', ArenaResource())
+app.add_route("/arena/fight", ArenaResource())
+app.add_route("/battle", BattleResource())

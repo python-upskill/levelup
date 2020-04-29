@@ -22,9 +22,9 @@ class Combatant:
 
 
 class Damage:
-    x = 0
-    y = 0
-    z = 0
+    x: int = 0
+    y: int = 0
+    z: int = None
 
     def __init__(self, damage):
         # XdY[ + Z]
@@ -41,6 +41,14 @@ class Damage:
         for __i in range(self.x):
             result += random.randint(1, self.y)
 
-        result += self.z
+        if self.z:
+            result += self.z
+
+        return result
+
+    def __str__(self):
+        result = f"{self.x}d{self.y}"
+        if self.z:
+            result += f"[ {self.z}]"
 
         return result
