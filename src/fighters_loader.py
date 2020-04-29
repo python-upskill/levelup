@@ -1,5 +1,5 @@
 import requests
-from fight_club import Fighter
+from fight_club import FighterDto
 
 class FightersLoader:
 	@staticmethod
@@ -22,7 +22,7 @@ class FightersLoader:
 					if("damage_dice" in damage):
 						damage_dice = damage["damage_dice"]
 						damage_bonus = FightersLoader.extract_fighter_damage_bonus(damage)
-						fighter = Fighter(name, hp, damage_dice, damage_bonus)
+						fighter = FighterDto(name, hp, damage_dice, damage_bonus)
 						return fighter
 		raise AttributeError(f"Fighter {name} doesn't have any damage points defined!")
 

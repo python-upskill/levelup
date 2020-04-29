@@ -22,7 +22,7 @@ class FightClub:
 		winner = fighters[-1]
 		loser = fighters[0]
 		ko = loser.hp <= 0;
-		victory = Victory(winner.name, round_number, ko)
+		victory = VictoryDto(winner.name, round_number, ko)
 		return victory
 
 	def draw_fighters_slots(self, fighters):
@@ -32,7 +32,7 @@ class FightClub:
 		fighters_with_drawed_slots = [first_fighter, second_fighter]
 		return fighters_with_drawed_slots
 
-	def fight(self, fighters_list: list, max_rounds_number: int) -> 'FightResult':
+	def fight(self, fighters_list: list, max_rounds_number: int) -> 'FightResultDto':
 		round_number = 1
 		rounds_summary_list = []
 		fighters = self.draw_fighters_slots(fighters_list)
@@ -44,33 +44,33 @@ class FightClub:
 			defender.hp = defender_previous_hp - damage
 			print(f"{round_number} {attacker.name} {defender.name} "
 				f"{damage} {defender_previous_hp} {defender.hp}")
-			round_summary = RoundSummary(round_number, attacker.name, defender.name, damage, defender_previous_hp, defender.hp)
+			round_summary = RoundSummaryDto(round_number, attacker.name, defender.name, damage, defender_previous_hp, defender.hp)
 			rounds_summary_list.append(round_summary)
 			round_number += 1
 		victory = self.__sum_up_fight(fighters, round_number)
-		fight_result = FightResult(rounds_summary_list, victory)
+		fight_result = FightResultDto(rounds_summary_list, victory)
 		return fight_result
 
 @dataclass
-class Fighter:
+class FighterDto:
 	name: str
 	hp: int
 	damage_dice: str
 	damage_bonus: int
 
 @dataclass
-class FightResult:
+class FightResultDto:
 	rounds: list
 	victory: object
 
 @dataclass
-class Victory:
+class VictoryDto:
 	winner_name: str
 	rounds_number: int
 	ko: bool
 
 @dataclass
-class RoundSummary:
+class RoundSummaryDto:
 	round_number: int
 	attacker: str
 	defender: str
