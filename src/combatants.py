@@ -31,12 +31,14 @@ class Combatant(object):
     hp_before_attack: int
     hp_after_attack: int
     damage: int
+    damage_pattern: int
     dice_simulator: DiceSimulator
 
     def __init__(self, name: str, hp: int, damage: str):
         self.name = name
         self.hp_before_attack = hp
         self.hp_after_attack = hp
+        self.damage_pattern = damage
         self.dice_simulator = DiceSimulator().encode(damage)
 
     def _random_damage(self) -> int:
