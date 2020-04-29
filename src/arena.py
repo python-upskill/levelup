@@ -108,7 +108,7 @@ class Arena:
 
         @dataclass
         class Round:
-            round_number: str
+            round_number: int
             attacker: str
             defender: str
             damage: int
@@ -122,3 +122,5 @@ class Arena:
             winner: str
             rounds: int
             ko: bool
+
+    BattleResults = List[BattleResult]

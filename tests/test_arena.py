@@ -6,26 +6,26 @@ import arena
 class TestCombatant(TestCase):
 
     def test_damage_parsing_success(self):
-        damage1 = arena.Combatant.Damage("1d2")
-        self.assertEqual(damage1._Damage__dice_roll_number, 1)
-        self.assertEqual(damage1._Damage__dice_sides_number, 2)
-        self.assertEqual(damage1._Damage__attack_bonus, 0)
+        damage_1 = arena.Combatant.Damage("1d2")
+        self.assertEqual(damage_1._Damage__dice_roll_number, 1)
+        self.assertEqual(damage_1._Damage__dice_sides_number, 2)
+        self.assertEqual(damage_1._Damage__attack_bonus, 0)
 
-        damage2 = arena.Combatant.Damage("1d2 + 3")
-        self.assertEqual(damage2._Damage__dice_roll_number, 1)
-        self.assertEqual(damage2._Damage__dice_sides_number, 2)
-        self.assertEqual(damage2._Damage__attack_bonus, 3)
+        damage_2 = arena.Combatant.Damage("1d2 + 3")
+        self.assertEqual(damage_2._Damage__dice_roll_number, 1)
+        self.assertEqual(damage_2._Damage__dice_sides_number, 2)
+        self.assertEqual(damage_2._Damage__attack_bonus, 3)
 
     def test_damage_drawing(self):
         arena.random.randint = lambda a, b: 2
         self.assertEqual(arena.Combatant.Damage("1d2 + 3").draw(), 5)
 
     def test_combatant_damage(self):
-        combatant1 = arena.Combatant("a", 100, "1d2")
-        self.assertEqual("1d2", combatant1.damage())
+        combatant_1 = arena.Combatant("a", 100, "1d2")
+        self.assertEqual("1d2", combatant_1.damage())
 
-        combatant2 = arena.Combatant("a", 100, "1d2 + 3")
-        self.assertEqual("1d2 + 3", combatant2.damage())
+        combatant_2 = arena.Combatant("a", 100, "1d2 + 3")
+        self.assertEqual("1d2 + 3", combatant_2.damage())
 
     def test_combatant_attack(self):
         arena.random.randint = lambda a, b: 3
