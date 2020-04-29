@@ -13,14 +13,14 @@ def mocked_requests_get(*args, **kwargs):
         def json(self):
             return self.json_data
 
-    if args[0] == 'https://www.dnd5eapi.com/api/monsters/orc':
+    if args[0] == 'https://www.dnd5eapi.co/api/monsters/orc':
         return MockResponse({'hit_points': 100,
                              'actions': [
                                  {'damage': [
                                      {'damage_dice': '1d2'}
                                  ]}
                              ]}, 200)
-    elif args[0] == 'https://www.dnd5eapi.com/api/monsters/orc2':
+    elif args[0] == 'https://www.dnd5eapi.co/api/monsters/orc2':
         return MockResponse({'hit_points': 110,
                              'actions': [
                                  {},

@@ -4,7 +4,7 @@ import json
 
 
 def read_combatant(combatant_name: str) -> arena.Combatant:
-    response: requests.Response = requests.get("https://www.dnd5eapi.com/api/monsters/" + combatant_name)
+    response: requests.Response = requests.get("https://www.dnd5eapi.co/api/monsters/" + combatant_name)
     if response.status_code != 200:
         raise AttributeError(f"Combatant {combatant_name} not found!")
     response_json: json = response.json()
