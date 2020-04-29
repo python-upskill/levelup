@@ -34,7 +34,7 @@ class FightClubDbService:
 
 	@staticmethod
 	def save_fighter(fighter_index: str, dto: 'FighterDto'):
-		Fighter.create(index=fighter_index, name=dto.name, hp=dto.hp, damage_dice=dto.damage_dice, damage_bonus=dto.damage_bonus)
+		Fighter.create(index=fighter_index, **dataclasses.asdict(dto))
     
 	@staticmethod
 	def save_fight_result(fight_result: 'FightResultDto'):
@@ -54,10 +54,7 @@ class FightClubDbService:
 		query = (Round.select())
 		if len(predicates):
 			query = (query.where(reduce(operator.and_, predicates)))
-		fighters = []
-		for fighter in query:
-			fighters.append(fighter)
-		return fighters
+		return list(query)
 
 	@staticmethod
 	def find_fights_by_params(params):
@@ -71,10 +68,7 @@ class FightClubDbService:
 		query = (Round.select())
 		if len(predicates):
 			query = (query.where(reduce(operator.and_, predicates)))
-		fights = []
-		for fight in query:
-			fights.append(fight)
-		return fights
+		return list(query)
 
 	@staticmethod
 	def find_rounds_by_params(params):
@@ -88,10 +82,7 @@ class FightClubDbService:
 		query = (Round.select())
 		if len(predicates):
 			query = (query.where(reduce(operator.and_, predicates)))
-		rounds = []
-		for round in query:
-			rounds.append(round)
-		return rounds
+		return list(query)
 
 
 
