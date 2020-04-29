@@ -22,10 +22,10 @@ class TestCombatant(TestCase):
 
     def test_combatant_damage(self):
         combatant_1 = arena.Combatant("a", 100, "1d2")
-        self.assertEqual("1d2", combatant_1.damage())
+        self.assertEqual("1d2", combatant_1.damage)
 
         combatant_2 = arena.Combatant("a", 100, "1d2 + 3")
-        self.assertEqual("1d2 + 3", combatant_2.damage())
+        self.assertEqual("1d2 + 3", combatant_2.damage)
 
     def test_combatant_attack(self):
         arena.random.randint = lambda a, b: 3
@@ -35,37 +35,37 @@ class TestCombatant(TestCase):
 
         self.assertEqual(5, defender.last_health)
         self.assertEqual(5, defender.health)
-        self.assertFalse(defender.is_dead())
+        self.assertFalse(defender.is_dead)
 
         attacker.attack(defender)
         self.assertEqual(3, attacker.last_damage)
         self.assertEqual(5, defender.last_health)
         self.assertEqual(2, defender.health)
-        self.assertFalse(defender.is_dead())
+        self.assertFalse(defender.is_dead)
 
         attacker.attack(defender)
         self.assertEqual(3, attacker.last_damage)
         self.assertEqual(2, defender.last_health)
         self.assertEqual(0, defender.health)
-        self.assertTrue(defender.is_dead())
+        self.assertTrue(defender.is_dead)
 
 
 class TestArena(TestCase):
 
     def test_fight(self):
         arena.random.randint = lambda a, b: 3
-        battle_result_1: arena.Arena.BattleResult = arena.Arena(
+        battle_result_1: arena.BattleResult = arena.Arena(
             arena.Combatant("a", 100, "1d2"),
             arena.Combatant("b", 5, "1d2"),
             1).fight()
 
-        victory_1: arena.Arena.BattleResult.Victory = battle_result_1.victory
+        victory_1: arena.BattleResult.Victory = battle_result_1.victory
         self.assertEqual("a", victory_1.winner)
         self.assertEqual(1, victory_1.rounds)
         self.assertFalse(victory_1.ko)
 
         self.assertEqual(1, len(battle_result_1.rounds))
-        round_1: arena.Arena.BattleResult.Round = battle_result_1.rounds[0]
+        round_1: arena.BattleResult.Round = battle_result_1.rounds[0]
         self.assertEqual(1, round_1.round_number)
         self.assertEqual("a", round_1.attacker)
         self.assertEqual("b", round_1.defender)

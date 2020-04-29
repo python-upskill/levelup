@@ -13,6 +13,7 @@ class Combatant:
         self.last_damage = 0
         self.last_health = health
 
+    @property
     def damage(self) -> str:
         return self.__damage.to_string()
 
@@ -26,6 +27,7 @@ class Combatant:
         if self.health < 0:
             self.health = 0
 
+    @property
     def is_dead(self) -> bool:
         return self.health == 0
 
@@ -63,6 +65,32 @@ class Combatant:
 Combatants = List[Combatant]
 
 
+@dataclass
+class BattleResult:
+    rounds: 'Rounds'
+    victory: 'Victory'
+
+    @dataclass
+    class Round:
+        round_number: int
+        attacker: str
+        defender: str
+        damage: int
+        previous_hp: int
+        current_hp: int
+
+    Rounds = List['BattleResult.Round']
+
+    @dataclass
+    class Victory:
+        winner: str
+        rounds: int
+        ko: bool
+
+
+BattleResults = List[BattleResult]
+
+
 class Arena:
     c1: Combatant
     c2: Combatant
@@ -74,53 +102,29 @@ class Arena:
         self.max_rounds = max_rounds
 
     def fight(self) -> 'BattleResult':
-        rounds: 'BattleResult.Rounds' = []
-        victory: 'BattleResult.Victory'
+        rounds: BattleResult.Rounds = []
+        victory: BattleResult.Victory
         round_number: int = 1
-        while not self.c1.is_dead() and not self.c1.is_dead() and round_number <= self.max_rounds:
-            rounds.append(self.next_round(round_number, self.c1, self.c2))
+        while not self.c1.is_dead and not self.c1.is_dead and round_number <= self.max_rounds:
+            rounds.append(self.__next_round(round_number, self.c1, self.c2))
             self.c1, self.c2 = self.c2, self.c1
             round_number += 1
         else:
             if self.c1.health > self.c2.health:
-                victory = self.BattleResult.Victory(self.c1.name, round_number - 1, self.c2.is_dead())
+                victory = BattleResult.Victory(self.c1.name, round_number - 1, self.c2.is_dead)
             else:
-                victory = self.BattleResult.Victory(self.c2.name, round_number - 1, self.c1.is_dead())
+                victory = BattleResult.Victory(self.c2.name, round_number - 1, self.c1.is_dead)
         print(f'{victory.winner} won!')
-        return self.BattleResult(rounds, victory)
+        return BattleResult(rounds, victory)
 
-    def next_round(self, round_number: int, attacker: Combatant, defender: Combatant) -> 'Round':
+    @staticmethod
+    def __next_round(round_number: int, attacker: Combatant, defender: Combatant) -> 'Round':
         attacker.attack(defender)
         print(f'{str(round_number)} {attacker.name} {defender.name} {str(attacker.last_damage)} '
               f'{str(defender.last_health)} {str(defender.health)}')
-        return self.BattleResult.Round(round_number,
-                                       attacker.name,
-                                       defender.name,
-                                       attacker.last_damage,
-                                       defender.last_health,
-                                       defender.health)
-
-    @dataclass
-    class BattleResult:
-
-        rounds: 'Rounds'
-        victory: 'Victory'
-
-        @dataclass
-        class Round:
-            round_number: int
-            attacker: str
-            defender: str
-            damage: int
-            previous_hp: int
-            current_hp: int
-
-        Rounds = List['BattleResult.Round']
-
-        @dataclass
-        class Victory:
-            winner: str
-            rounds: int
-            ko: bool
-
-    BattleResults = List[BattleResult]
+        return BattleResult.Round(round_number,
+                                  attacker.name,
+                                  defender.name,
+                                  attacker.last_damage,
+                                  defender.last_health,
+                                  defender.health)

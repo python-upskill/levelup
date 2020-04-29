@@ -22,7 +22,7 @@ class CombatantModel(BaseModel):
                        combatant: arena.Combatant) -> 'CombatantModel':
         return self.create(name=combatant.name,
                            health=combatant.health,
-                           damage=combatant.damage())
+                           damage=combatant.damage)
 
     def to_combatant(self):
         return arena.Combatant(self.name, self.health, self.damage)
@@ -35,7 +35,7 @@ class BattleResultModel(BaseModel):
     ko = BooleanField()
 
     def from_battle_result(self,
-                           battle_result: arena.Arena.BattleResult,
+                           battle_result: arena.BattleResult,
                            combatant_model_winner: CombatantModel) -> 'BattleResultModel':
         return self.create(
             created_date=datetime.datetime.now(),
@@ -43,8 +43,8 @@ class BattleResultModel(BaseModel):
             winner=combatant_model_winner,
             ko=battle_result.victory.ko)
 
-    def to_battle_result(self, battle_result_round_models: 'BattleResultRoundModels') -> arena.Arena.BattleResult:
-        return arena.Arena.BattleResult(victory=arena.Arena.BattleResult.Victory(
+    def to_battle_result(self, battle_result_round_models: 'BattleResultRoundModels') -> arena.BattleResult:
+        return arena.BattleResult(victory=arena.BattleResult.Victory(
             rounds=self.rounds,
             winner=self.winner.name,
             ko=self.ko),
@@ -67,7 +67,7 @@ class BattleResultRoundModel(BaseModel):
         )
 
     def from_battle_result_round(self,
-                                 battle_result_round: arena.Arena.BattleResult.Round,
+                                 battle_result_round: arena.BattleResult.Round,
                                  battle_result_model: BattleResultModel,
                                  combatant_model_attacker: CombatantModel,
                                  combatant_model_defender: CombatantModel) -> 'BattleResultRoundModel':
@@ -80,8 +80,8 @@ class BattleResultRoundModel(BaseModel):
             previous_hp=battle_result_round.previous_hp,
             current_hp=battle_result_round.current_hp)
 
-    def to_battle_result_round(self) -> arena.Arena.BattleResult.Round:
-        return arena.Arena.BattleResult.Round(
+    def to_battle_result_round(self) -> arena.BattleResult.Round:
+        return arena.BattleResult.Round(
             round_number=self.round_number,
             attacker=self.attacker.name,
             defender=self.defender.name,
@@ -117,7 +117,7 @@ def read_combatant(combatant_name: str) -> arena.Combatant:
         return None
 
 
-def write_battle_result(battle_result: arena.Arena.BattleResult):
+def write_battle_result(battle_result: arena.BattleResult):
     combatant_models: dict = {
         battle_result.rounds[0].attacker: CombatantModel.get(CombatantModel.name == battle_result.rounds[0].attacker),
         battle_result.rounds[0].defender: CombatantModel.get(CombatantModel.name == battle_result.rounds[0].defender),
@@ -131,7 +131,7 @@ def write_battle_result(battle_result: arena.Arena.BattleResult):
                                                           combatant_models.get(battle_result_round.defender))
 
 
-def read_battle_result_latest() -> arena.Arena.BattleResult:
+def read_battle_result_latest() -> arena.BattleResult:
     battle_result_model: BattleResultModel = BattleResultModel.select()\
         .order_by(BattleResultModel.created_date.desc()).get()
     battle_result_round_models: BattleResultRoundModels = BattleResultRoundModel.select() \
