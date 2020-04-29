@@ -52,6 +52,9 @@ class BattleResultModel(BaseModel):
                     for battle_result_round_model in battle_result_round_models])
 
 
+BattleResultModels = List[BattleResultModel]
+
+
 class BattleResultRoundModel(BaseModel):
     battle = ForeignKeyField(BattleResultModel, backref='battles')
     attacker = ForeignKeyField(CombatantModel, field='name', backref='attacks')
@@ -131,9 +134,12 @@ def write_battle_result(battle_result: arena.BattleResult):
                                                           combatant_models.get(battle_result_round.defender))
 
 
-def read_battle_result_latest() -> arena.BattleResult:
-    battle_result_model: BattleResultModel = BattleResultModel.select()\
-        .order_by(BattleResultModel.created_date.desc()).get()
-    battle_result_round_models: BattleResultRoundModels = BattleResultRoundModel.select() \
-        .where(BattleResultRoundModel.battle == battle_result_model)
-    return battle_result_model.to_battle_result(battle_result_round_models)
+def __to_battle_result(battle_result_model: BattleResultModel) -> arena.BattleResult:
+    return battle_result_model.to_battle_result(
+        BattleResultRoundModel.select().where(BattleResultRoundModel.battle == battle_result_model))
+
+
+def read_battle_result_latest(limit: int) -> arena.BattleResults:
+    battle_result_models: BattleResultRoundModels = BattleResultModel.select() \
+        .order_by(BattleResultModel.created_date.desc()).limit(limit)
+    return [__to_battle_result(battle_result_model) for battle_result_model in battle_result_models]

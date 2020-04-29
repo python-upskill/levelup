@@ -36,13 +36,13 @@ class TestBattleResultModel(TestCase):
         database.write_combatant(combatant_2)
 
         round_1 = arena.BattleResult.Round(round_number=1, attacker="a", defender="b",
-                                                 damage=4, previous_hp=100, current_hp=96)
+                                           damage=4, previous_hp=100, current_hp=96)
         round_2 = arena.BattleResult.Round(round_number=2, attacker="b", defender="a",
-                                                 damage=5, previous_hp=100, current_hp=95)
+                                           damage=5, previous_hp=100, current_hp=95)
         victory = arena.BattleResult.Victory(rounds=2, winner="b", ko=False)
         battle_result_1 = arena.BattleResult(rounds=[round_1, round_2], victory=victory)
 
         database.write_battle_result(battle_result_1)
 
-        battle_result_2 = database.read_battle_result_latest()
+        battle_result_2 = database.read_battle_result_latest(1)[0]
         self.assertEqual(battle_result_1, battle_result_2)
