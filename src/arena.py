@@ -1,24 +1,20 @@
-import json
 import random
 import re
-import requests
-from json import JSONEncoder
 from typing import List
-from wsgiref import simple_server
-import marshmallow_dataclass
-
-import falcon
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 class Combatant:
 
-    def __init__(self, name: str, hp: int, damage: str):
+    def __init__(self, name: str, health: int, damage: str):
         self.name = name
-        self.health = hp
+        self.health = health
         self.__damage = self.Damage(damage)
         self.last_damage = 0
-        self.last_health = hp
+        self.last_health = health
+
+    def damage(self) -> str:
+        return self.__damage.to_string()
 
     def attack(self, other: 'Combatant'):
         self.last_damage = self.__damage.draw()
@@ -49,6 +45,12 @@ class Combatant:
                     self.__attack_bonus = int(z)
                 else:
                     self.__attack_bonus = 0
+
+        def to_string(self) -> str:
+            return str(self.__dice_roll_number) \
+                   + "d" \
+                   + str(self.__dice_sides_number) \
+                   + ((" + " + str(self.__attack_bonus)) if self.__attack_bonus != 0 else "")
 
         def draw(self):
             result = 0
@@ -113,59 +115,10 @@ class Arena:
             previous_hp: int
             current_hp: int
 
-        Rounds = List['Battle.Round']
+        Rounds = List['BattleResult.Round']
 
         @dataclass
         class Victory:
             winner: str
             rounds: int
             ko: bool
-
-
-class CombatantsLoader:
-
-    def load_combatants(self, combatant_1_name: str, combatant_2_name: str) -> Combatants:
-        return [self.__load_combatant(combatant_1_name), self.__load_combatant(combatant_2_name)]
-
-    def __load_combatant(self, combatant_name: str) -> Combatants:
-        response: requests.Response = requests.get("https://www.dnd5eapi.co/api/monsters/" + combatant_name)
-        if not response.ok:
-            raise AttributeError(f"Combatant {combatant_name} not found!")
-        monster: 'Monster' = marshmallow_dataclass.class_schema(self.Monster).load(json.load(response.content))
-        damage: 'Monster.Action.Damage' = next(i for i in len(monster.actions)
-                                        if monster.actions[i].damage.damage_dice is not None)
-        return Combatant(combatant_name, monster.hit_points, damage.damage_dice)
-
-    @dataclass
-    class Monster:
-        hit_points: int
-        actions: List['Monster.Action']
-
-        @dataclass
-        class Action:
-            damage: 'Damage'
-
-            @dataclass
-            class Damage:
-                damage_dice: str
-                damage_bonus: str
-
-
-class ArenaResource:
-
-    def on_post(self, req, resp):
-        resp.status = falcon.HTTP_200
-        combatants: Combatants = CombatantsLoader().load_combatants("orc", "orc")
-        resp.body = json.dumps(Arena(combatants[0], combatants[1], 10).fight(), cls=self.BattleResultEncoder)
-
-    class BattleResultEncoder(JSONEncoder):
-        def default(self, o):
-            return o.__dict__
-
-
-app = falcon.API()
-app.add_route('/fight', ArenaResource())
-
-if __name__ == "__main__":
-    httpd = simple_server.make_server('127.0.0.1', 7011, app)
-    httpd.serve_forever()

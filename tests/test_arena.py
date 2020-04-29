@@ -20,7 +20,14 @@ class TestCombatant(TestCase):
         arena.random.randint = lambda a, b: 2
         self.assertEqual(arena.Combatant.Damage("1d2 + 3").draw(), 5)
 
-    def test_combatant(self):
+    def test_combatant_damage(self):
+        combatant1 = arena.Combatant("a", 100, "1d2")
+        self.assertEqual("1d2", combatant1.damage())
+
+        combatant2 = arena.Combatant("a", 100, "1d2 + 3")
+        self.assertEqual("1d2 + 3", combatant2.damage())
+
+    def test_combatant_attack(self):
         arena.random.randint = lambda a, b: 3
 
         attacker = arena.Combatant("a", 100, "1d2")
