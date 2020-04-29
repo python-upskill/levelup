@@ -17,11 +17,11 @@ class Combatant:
     def damage(self) -> str:
         return self.__damage.to_string()
 
-    def attack(self, other: 'Combatant'):
+    def attack(self, other: 'Combatant') -> None:
         self.last_damage = self.__damage.draw()
         other.__get_attacked(self.last_damage)
 
-    def __get_attacked(self, damage: int):
+    def __get_attacked(self, damage: int) -> None:
         self.last_health = self.health
         self.health -= damage
         if self.health < 0:
@@ -43,10 +43,7 @@ class Combatant:
                 self.__dice_roll_number = int(m.group(1))
                 self.__dice_sides_number = int(m.group(2))
                 z = m.group(4)
-                if z:
-                    self.__attack_bonus = int(z)
-                else:
-                    self.__attack_bonus = 0
+                self.__attack_bonus = int(z or 0)
 
         def to_string(self) -> str:
             return str(self.__dice_roll_number) \
@@ -54,7 +51,7 @@ class Combatant:
                    + str(self.__dice_sides_number) \
                    + ((" + " + str(self.__attack_bonus)) if self.__attack_bonus != 0 else "")
 
-        def draw(self):
+        def draw(self) -> int:
             result = 0
             for i in range(self.__dice_roll_number):
                 result += random.randint(1, self.__dice_sides_number)
@@ -109,11 +106,10 @@ class Arena:
             rounds.append(self.__next_round(round_number, self.c1, self.c2))
             self.c1, self.c2 = self.c2, self.c1
             round_number += 1
+        if self.c1.health > self.c2.health:
+            victory = BattleResult.Victory(self.c1.name, round_number - 1, self.c2.is_dead)
         else:
-            if self.c1.health > self.c2.health:
-                victory = BattleResult.Victory(self.c1.name, round_number - 1, self.c2.is_dead)
-            else:
-                victory = BattleResult.Victory(self.c2.name, round_number - 1, self.c1.is_dead)
+            victory = BattleResult.Victory(self.c2.name, round_number - 1, self.c1.is_dead)
         print(f'{victory.winner} won!')
         return BattleResult(rounds, victory)
 

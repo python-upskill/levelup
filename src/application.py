@@ -49,12 +49,13 @@ class BattleResultsResource:
 
     def on_get(self, req, resp):
         battle_results_request = self.BattleResultsRequest(**req.params)
-        if battle_results_request.limit <= 0:
+        if int(battle_results_request.limit) <= 0:
             raise AttributeError(f"limit: {battle_results_request.limit} <=0!")
-        if battle_results_request.limit > 100:
+        if int(battle_results_request.limit) > 100:
             raise AttributeError(f"limit: {battle_results_request.limit} >100!")
 
-        battle_results: arena.Arena.BattleResults = database.read_battle_result_latest(battle_results_request.limit)
+        battle_results: arena.Arena.BattleResults = database.read_battle_result_latest(
+            int(battle_results_request.limit))
         resp.status = falcon.HTTP_200
         resp.body = json.dumps(battle_results, cls=self.BattleResultsEncoder)
 
@@ -64,7 +65,7 @@ class BattleResultsResource:
 
     @dataclass
     class BattleResultsRequest:
-        limit: int
+        limit: str
 
 
 def create():

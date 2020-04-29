@@ -96,19 +96,19 @@ class BattleResultRoundModel(BaseModel):
 BattleResultRoundModels = List[BattleResultRoundModel]
 
 
-def setup():
+def setup() -> None:
     if db.is_closed():
         db.connect()
     db.create_tables([CombatantModel, BattleResultModel, BattleResultRoundModel])
 
 
-def tear_down():
+def tear_down() -> None:
     if db.is_closed():
         db.connect()
     db.drop_tables([CombatantModel, BattleResultModel, BattleResultRoundModel])
 
 
-def write_combatant(combatant: arena.Combatant):
+def write_combatant(combatant: arena.Combatant) -> None:
     CombatantModel().from_combatant(combatant)
 
 
@@ -120,7 +120,7 @@ def read_combatant(combatant_name: str) -> arena.Combatant:
         return None
 
 
-def write_battle_result(battle_result: arena.BattleResult):
+def write_battle_result(battle_result: arena.BattleResult) -> None:
     combatant_models: dict = {
         battle_result.rounds[0].attacker: CombatantModel.get(CombatantModel.name == battle_result.rounds[0].attacker),
         battle_result.rounds[0].defender: CombatantModel.get(CombatantModel.name == battle_result.rounds[0].defender),
