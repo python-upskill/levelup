@@ -16,8 +16,9 @@ class CombatantEntity(Model):
 
 class BattleEntity(Model):
     id = PrimaryKeyField()
-    winner_id = ForeignKeyField(CombatantEntity)
+    winner_id = ForeignKeyField(model=CombatantEntity, null=True)
     ko = BooleanField(default=0)
+    max_rounds = IntegerField(null=True)
 
     class Meta:
         database = db
@@ -30,9 +31,6 @@ class RoundEntity(Model):
     battle_id = ForeignKeyField(BattleEntity)
     attacker_id = ForeignKeyField(CombatantEntity)
     opponent_id = ForeignKeyField(CombatantEntity)
-    damage = IntegerField()
-    opponent_hp_before_attack = IntegerField()
-    opponent_hp_after_attack = IntegerField()
 
     class Meta:
         database = db
@@ -40,13 +38,15 @@ class RoundEntity(Model):
 
 
 class CombatantState(Model):
-    id = ForeignKeyField(CombatantEntity)
+    round_id = ForeignKeyField(RoundEntity)
+    combatant_id = ForeignKeyField(CombatantEntity)
     hp_before_attack = IntegerField()
     hp_after_attack = IntegerField()
 
     class Meta:
         database = db
         db_table = 'combatant_states'
+        primary_key = CompositeKey('round_id', 'combatant_id')
 
 
 def create_tables():
