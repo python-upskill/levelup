@@ -1,10 +1,8 @@
 from peewee import *
-from dataclasses import dataclass
 
 db = SqliteDatabase('../../combat.db')
 
 
-@dataclass
 class CombatantEntity(Model):
     id = PrimaryKeyField()
     name = TextField()

@@ -93,12 +93,12 @@ class DbUrlCombatantRetriever(UrlCombatantRetriever):
         self.combatants_from_db = self.combatants_query.find_by_name(name)
         if not self.combatants_from_db:
             return super()._by_name(name)
-        return
+        return self
 
     def _retrieve_by_name(self) -> list:
         if self.combatants_from_db:
             mapper = FromTableMapper()
-            return map(lambda c: mapper.map_combatant(c), self.combatants_from_db)
+            return list(map(lambda c: mapper.map_combatant(c), self.combatants_from_db))
         return super()._retrieve_by_name()
 
     def _cache_combatant(self, combatant: Combatant):
@@ -111,19 +111,3 @@ class DbUrlCombatantRetriever(UrlCombatantRetriever):
 
 class CombatantNotFoundException(Exception):
     pass
-
-
-# r = DbUrlCombatantRetriever()
-# c = r.by_names(['orc']).retrieve()
-# pass
-
-d = {'name': 'orc', 'hp': 150, 'damage': '3d6'}
-c = Combatant(**d)
-pass
-
-# l = ['ax', 'by']
-# # ''.startswith()
-# filtered = list(filter(lambda w: w.startswith('a'), l))
-# for f in filtered:
-#     print(f)
-# pass

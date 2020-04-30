@@ -11,5 +11,6 @@ class FromTableMapper:
 class ToTableMapper:
 
     def map_combatant(self, obj: combatants.model.Combatant) -> schema.CombatantEntity:
-        return schema.CombatantEntity(name=obj.name, hit_points=obj.hp_before_attack,
-                                      damage_pattern=obj.damage_pattern)
+        return schema.CombatantEntity.create(name=obj.name,
+                                             hit_points=obj.hp_before_attack,
+                                             damage_pattern=obj.damage_pattern)
