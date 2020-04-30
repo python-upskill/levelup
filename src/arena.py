@@ -1,11 +1,10 @@
 import random
 import re
-from typing import List
 from dataclasses import dataclass
+from typing import List
 
 
 class Combatant:
-
     def __init__(self, name: str, health: int, damage: str):
         self.name = name
         self.health = health
@@ -17,7 +16,7 @@ class Combatant:
     def damage(self) -> str:
         return self.__damage.to_string()
 
-    def attack(self, other: 'Combatant') -> None:
+    def attack(self, other: "Combatant") -> None:
         self.last_damage = self.__damage.draw()
         other.__get_attacked(self.last_damage)
 
@@ -46,10 +45,16 @@ class Combatant:
                 self.__attack_bonus = int(z or 0)
 
         def to_string(self) -> str:
-            return str(self.__dice_roll_number) \
-                   + "d" \
-                   + str(self.__dice_sides_number) \
-                   + ((" + " + str(self.__attack_bonus)) if self.__attack_bonus != 0 else "")
+            return (
+                str(self.__dice_roll_number)
+                + "d"
+                + str(self.__dice_sides_number)
+                + (
+                    (" + " + str(self.__attack_bonus))
+                    if self.__attack_bonus != 0
+                    else ""
+                )
+            )
 
         def draw(self) -> int:
             result = 0
@@ -64,8 +69,8 @@ Combatants = List[Combatant]
 
 @dataclass
 class BattleResult:
-    rounds: 'Rounds'
-    victory: 'Victory'
+    rounds: "Rounds"
+    victory: "Victory"
 
     @dataclass
     class Round:
@@ -76,7 +81,7 @@ class BattleResult:
         previous_hp: int
         current_hp: int
 
-    Rounds = List['BattleResult.Round']
+    Rounds = List["BattleResult.Round"]
 
     @dataclass
     class Victory:
@@ -98,29 +103,44 @@ class Arena:
         self.c2 = c2
         self.max_rounds = max_rounds
 
-    def fight(self) -> 'BattleResult':
+    def fight(self) -> "BattleResult":
         rounds: BattleResult.Rounds = []
         victory: BattleResult.Victory
         round_number: int = 1
-        while not self.c1.is_dead and not self.c1.is_dead and round_number <= self.max_rounds:
+        while (
+            not self.c1.is_dead
+            and not self.c1.is_dead
+            and round_number <= self.max_rounds
+        ):
             rounds.append(self.__next_round(round_number, self.c1, self.c2))
             self.c1, self.c2 = self.c2, self.c1
             round_number += 1
         if self.c1.health > self.c2.health:
-            victory = BattleResult.Victory(self.c1.name, round_number - 1, self.c2.is_dead)
+            victory = BattleResult.Victory(
+                self.c1.name, round_number - 1, self.c2.is_dead
+            )
         else:
-            victory = BattleResult.Victory(self.c2.name, round_number - 1, self.c1.is_dead)
-        print(f'{victory.winner} won!')
+            victory = BattleResult.Victory(
+                self.c2.name, round_number - 1, self.c1.is_dead
+            )
+        print(f"{victory.winner} won!")
         return BattleResult(rounds, victory)
 
     @staticmethod
-    def __next_round(round_number: int, attacker: Combatant, defender: Combatant) -> 'Round':
+    def __next_round(
+        round_number: int, attacker: Combatant, defender: Combatant
+    ) -> "Round":
         attacker.attack(defender)
-        print(f'{str(round_number)} {attacker.name} {defender.name} {str(attacker.last_damage)} '
-              f'{str(defender.last_health)} {str(defender.health)}')
-        return BattleResult.Round(round_number,
-                                  attacker.name,
-                                  defender.name,
-                                  attacker.last_damage,
-                                  defender.last_health,
-                                  defender.health)
+        print(
+            f"{str(round_number)} {attacker.name} {defender.name} "
+            f"{str(attacker.last_damage)} "
+            f"{str(defender.last_health)} {str(defender.health)}"
+        )
+        return BattleResult.Round(
+            round_number,
+            attacker.name,
+            defender.name,
+            attacker.last_damage,
+            defender.last_health,
+            defender.health,
+        )

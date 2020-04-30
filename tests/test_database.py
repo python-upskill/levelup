@@ -5,7 +5,6 @@ import database
 
 
 class TestCombatantModel(TestCase):
-
     def test_combatant_write_read(self):
         database.tear_down()
         database.setup()
@@ -24,7 +23,6 @@ class TestCombatantModel(TestCase):
 
 
 class TestBattleResultModel(TestCase):
-
     def test_battle_result_write_read(self):
         database.tear_down()
         database.setup()
@@ -35,10 +33,22 @@ class TestBattleResultModel(TestCase):
         combatant_2 = arena.Combatant("b", 100, "1d5")
         database.write_combatant(combatant_2)
 
-        round_1 = arena.BattleResult.Round(round_number=1, attacker="a", defender="b",
-                                           damage=4, previous_hp=100, current_hp=96)
-        round_2 = arena.BattleResult.Round(round_number=2, attacker="b", defender="a",
-                                           damage=5, previous_hp=100, current_hp=95)
+        round_1 = arena.BattleResult.Round(
+            round_number=1,
+            attacker="a",
+            defender="b",
+            damage=4,
+            previous_hp=100,
+            current_hp=96,
+        )
+        round_2 = arena.BattleResult.Round(
+            round_number=2,
+            attacker="b",
+            defender="a",
+            damage=5,
+            previous_hp=100,
+            current_hp=95,
+        )
         victory = arena.BattleResult.Victory(rounds=2, winner="b", ko=False)
         battle_result_1 = arena.BattleResult(rounds=[round_1, round_2], victory=victory)
 

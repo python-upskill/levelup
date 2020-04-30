@@ -4,7 +4,6 @@ import arena
 
 
 class TestCombatant(TestCase):
-
     def test_damage_parsing_success(self):
         damage_1 = arena.Combatant.Damage("1d2")
         self.assertEqual(damage_1._Damage__dice_roll_number, 1)
@@ -51,13 +50,11 @@ class TestCombatant(TestCase):
 
 
 class TestArena(TestCase):
-
     def test_fight(self):
         arena.random.randint = lambda a, b: 3
         battle_result_1: arena.BattleResult = arena.Arena(
-            arena.Combatant("a", 100, "1d2"),
-            arena.Combatant("b", 5, "1d2"),
-            1).fight()
+            arena.Combatant("a", 100, "1d2"), arena.Combatant("b", 5, "1d2"), 1
+        ).fight()
 
         victory_1: arena.BattleResult.Victory = battle_result_1.victory
         self.assertEqual("a", victory_1.winner)
