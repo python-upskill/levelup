@@ -1,7 +1,8 @@
 [run]
-source = .
-omit = .tox/*
+source = src
+	tests
+#omit = .tox/*
 branch=true
 [report]
-show_missing = true
-skip_covered = true
+#show_missing = true
+#skip_covered = true
