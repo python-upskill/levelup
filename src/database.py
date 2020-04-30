@@ -23,7 +23,7 @@ class CombatantModel(BaseModel):
             name=combatant.name, health=combatant.health, damage=combatant.damage
         )
 
-    def to_combatant(self):
+    def to_combatant(self) -> arena.Combatant:
         return arena.Combatant(self.name, self.health, self.damage)
 
 

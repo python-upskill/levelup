@@ -11,7 +11,7 @@ def read_combatant(combatant_name: str) -> arena.Combatant:
     )
     if response.status_code != 200:
         raise AttributeError(f"Combatant {combatant_name} not found!")
-    response_json: json = response.json()
+    response_json: dict = response.json()
     return arena.Combatant(
         combatant_name,
         response_json["hit_points"],
@@ -29,3 +29,4 @@ def __get_damage_dice(actions) -> str:
                         if ("damage_bonus" in damage_item)
                         else ""
                     )
+    raise AttributeError(f"damage_dice not found in: {actions}")

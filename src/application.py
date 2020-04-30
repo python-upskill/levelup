@@ -21,7 +21,7 @@ class ArenaResource:
                 f"not enough combatants: {len(fight_request.combatants)}"
             )
 
-        battle_result: arena.Arena.BattleResult = arena.Arena(
+        battle_result: arena.BattleResult = arena.Arena(
             self.read_combatant(fight_request.combatants[0]),
             self.read_combatant(fight_request.combatants[1]),
             fight_request.max_rounds,
@@ -56,7 +56,7 @@ class BattleResultsResource:
         if int(battle_results_request.limit) > 100:
             raise AttributeError(f"limit: {battle_results_request.limit} >100!")
 
-        battle_results: arena.Arena.BattleResults = database.read_battle_result_latest(
+        battle_results: arena.BattleResults = database.read_battle_result_latest(
             int(battle_results_request.limit)
         )
         resp.status = falcon.HTTP_200
