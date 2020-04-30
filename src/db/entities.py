@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from peewee import *
 import datetime
 
@@ -22,7 +24,7 @@ class BattleEntity(BaseEntity):
     id = PrimaryKeyField()
     created_at = DateTimeField(default=datetime.datetime.now)
     winner = ForeignKeyField(CombatantEntity)
-    rounds = IntegerField()
+    round = IntegerField()
     ko = BooleanField()
 
     class Meta:

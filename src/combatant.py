@@ -41,8 +41,7 @@ class Damage:
         for __i in range(self.x):
             result += random.randint(1, self.y)
 
-        if self.z:
-            result += self.z
+        result += self.z or 0
 
         return result
 

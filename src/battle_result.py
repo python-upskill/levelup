@@ -1,3 +1,5 @@
+from typing import List
+
 import jsonpickle
 from combatant import Combatant
 from dataclasses import dataclass
@@ -21,7 +23,7 @@ class RoundResult:
 
 
 class BattleResult:
-    rounds = [RoundResult]
+    rounds: List[RoundResult]
     victory: Victory
 
     def __init__(self):
