@@ -24,7 +24,7 @@ def __get_damage_dice(actions) -> str:
         if "damage" in action:
             for damage_item in action["damage"]:
                 if "damage_dice" in damage_item:
-                    return damage_item["damage_dice"] + (
+                    return str(damage_item["damage_dice"]) + (
                         (" + " + str(damage_item["damage_bonus"]))
                         if ("damage_bonus" in damage_item)
                         else ""

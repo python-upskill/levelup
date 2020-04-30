@@ -129,7 +129,7 @@ class Arena:
     @staticmethod
     def __next_round(
         round_number: int, attacker: Combatant, defender: Combatant
-    ) -> "Round":
+    ) -> BattleResult.Round:
         attacker.attack(defender)
         print(
             f"{str(round_number)} {attacker.name} {defender.name} "
