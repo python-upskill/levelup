@@ -1,4 +1,6 @@
 import re
+from db.query import *
+from db.mapper import FromTableMapper, ToTableMapper
 from util.json_operations import *
 from random import randint
 from abc import ABC
@@ -60,7 +62,7 @@ class CombatantsRetriever(ABC):
     def __init__(self, json_retriever: JsonRetriever):
         self.json_retriever = json_retriever
 
-    def _create_combatants(self, json_elements: list):
+    def _create_combatants(self, json_elements: list) -> list:
         result = []
         for e in json_elements:
             result.append(Combatant(**e))
@@ -69,10 +71,10 @@ class CombatantsRetriever(ABC):
     def _retrieve_json(self) -> list:
         return self.json_retriever.retrieve()
 
-    def _retrieve_from_json(self):
+    def _retrieve_from_json(self) -> list:
         return self._create_combatants(self._retrieve_json())
 
-    def retrieve(self):
+    def retrieve(self) -> list:
         return self._retrieve_from_json()
 
 
@@ -116,15 +118,45 @@ class UrlCombatantRetriever(CombatantsRetriever):
         self._from_url(f"{host}{urls[0]['results'][0]['url']}")
         return self
 
+    def _retrieve_by_name(self) -> list:
+        return self._retrieve_from_json()
+
+    def _cache_combatant(self, combatant: Combatant):
+        self.combatants.append(combatant)
+
     def by_names(self, combatant_names: list):
         self.combatants.clear()
         for name in combatant_names[:2]:
-            combatant_list = self._by_name(name)._retrieve_from_json()
-            self.combatants.append(combatant_list[0])
+            combatant_list = self._by_name(name)._retrieve_by_name()
+            self._cache_combatant(combatant_list[0])
         return self
 
-    def retrieve(self):
+    def retrieve(self) -> list:
         return self.combatants
+
+
+class DbUrlCombatantRetriever(UrlCombatantRetriever):
+    combatants_query: CombatantQuery = CombatantQuery()
+    combatants_from_db: list
+
+    def _by_name(self, name: str):
+        self.combatants_from_db = self.combatants_query.find_by_name(name)
+        if not self.combatants_from_db:
+            return super()._by_name(name)
+        return
+
+    def _retrieve_by_name(self) -> list:
+        if self.combatants_from_db:
+            mapper = FromTableMapper()
+            return map(lambda c: mapper.map_combatant(c), self.combatants_from_db)
+        return super()._retrieve_by_name()
+
+    def _cache_combatant(self, combatant: Combatant):
+        filtered = list(filter(lambda c: c.name == combatant.name, self.combatants_from_db))
+        if not filtered:
+            mapper = ToTableMapper()
+            mapper.map_combatant(combatant).save()
+        super()._cache_combatant(combatant)
 
 
 class CombatantNotFoundException(Exception):

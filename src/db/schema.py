@@ -1,13 +1,15 @@
 from peewee import *
+from dataclasses import dataclass
 
 db = SqliteDatabase('../../combat.db')
 
 
+@dataclass
 class Combatant(Model):
     id = PrimaryKeyField()
-    name = CharField()
+    name = TextField()
     hit_points = IntegerField()
-    damage_pattern = CharField()
+    damage_pattern = TextField()
 
     class Meta:
         database = db
@@ -39,8 +41,18 @@ class Round(Model):
         db_table = 'rounds'
 
 
+class CombatantState(Model):
+    id = ForeignKeyField(Combatant)
+    hp_before_attack = IntegerField()
+    hp_after_attack = IntegerField()
+
+    class Meta:
+        database = db
+        db_table = 'combatant_states'
+
+
 def create_tables():
-    for e in [Combatant, Battle, Round]:
+    for e in [Combatant, Battle, Round, CombatantState]:
         if not e.table_exists():
             e.create_table()
 
