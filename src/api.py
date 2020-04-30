@@ -2,7 +2,7 @@ import falcon
 import json
 from util.json_operations import toJSON
 from arena import JsonArena
-from combatants import CombatantNotFoundException
+from combatants.retriever import CombatantNotFoundException
 
 
 class CombatantResource:

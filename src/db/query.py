@@ -1,4 +1,3 @@
-import combatants
 from db.schema import *
 from abc import ABC
 import peewee

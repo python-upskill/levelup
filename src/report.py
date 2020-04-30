@@ -1,5 +1,5 @@
 from util import json_operations
-from combatants import *
+from combatants.retriever import *
 from dataclasses import dataclass
 
 
