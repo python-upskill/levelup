@@ -11,5 +11,5 @@ class Query(ABC):
 
 class CombatantQuery(Query):
 
-    def find_by_name(self, name: str) -> Combatant:
-        return self.find_by_query(Combatant.select().where(Combatant.name.contains(name)));
+    def find_by_name(self, name: str) -> CombatantEntity:
+        return self.find_by_query(CombatantEntity.select().where(CombatantEntity.name.contains(name)));

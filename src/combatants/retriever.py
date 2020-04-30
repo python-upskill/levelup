@@ -1,5 +1,5 @@
 from combatants.model import *
-# from db.query import *
+from db.query import *
 from db.mapper import FromTableMapper, ToTableMapper
 from util.json_operations import *
 from abc import ABC

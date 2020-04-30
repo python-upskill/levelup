@@ -5,7 +5,7 @@ db = SqliteDatabase('../../combat.db')
 
 
 @dataclass
-class Combatant(Model):
+class CombatantEntity(Model):
     id = PrimaryKeyField()
     name = TextField()
     hit_points = IntegerField()
@@ -16,9 +16,9 @@ class Combatant(Model):
         db_table = 'combatants'
 
 
-class Battle(Model):
+class BattleEntity(Model):
     id = PrimaryKeyField()
-    winner_id = ForeignKeyField(Combatant)
+    winner_id = ForeignKeyField(CombatantEntity)
     ko = BooleanField(default=0)
 
     class Meta:
@@ -26,12 +26,12 @@ class Battle(Model):
         db_table = 'battles'
 
 
-class Round(Model):
+class RoundEntity(Model):
     id = PrimaryKeyField()
     round_number = IntegerField()
-    battle_id = ForeignKeyField(Battle)
-    attacker_id = ForeignKeyField(Combatant)
-    opponent_id = ForeignKeyField(Combatant)
+    battle_id = ForeignKeyField(BattleEntity)
+    attacker_id = ForeignKeyField(CombatantEntity)
+    opponent_id = ForeignKeyField(CombatantEntity)
     damage = IntegerField()
     opponent_hp_before_attack = IntegerField()
     opponent_hp_after_attack = IntegerField()
@@ -42,7 +42,7 @@ class Round(Model):
 
 
 class CombatantState(Model):
-    id = ForeignKeyField(Combatant)
+    id = ForeignKeyField(CombatantEntity)
     hp_before_attack = IntegerField()
     hp_after_attack = IntegerField()
 
@@ -52,7 +52,7 @@ class CombatantState(Model):
 
 
 def create_tables():
-    for e in [Combatant, Battle, Round, CombatantState]:
+    for e in [CombatantEntity, BattleEntity, RoundEntity, CombatantState]:
         if not e.table_exists():
             e.create_table()
 
