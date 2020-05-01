@@ -6,15 +6,18 @@ class Arena:
     attacker: Combatant
     opponent: Combatant
     battle_reporter: 'BattleReporter'
+    combatants_retriever: CombatantsRetriever
     max_rounds: int
 
     def __init__(self, battle_reporter: 'BattleReporter' = BattleReporter(),
+                 combatants_retriever: CombatantsRetriever = FileCombatantRetriever(),
                  max_rounds: int = None):
         self.battle_reporter = battle_reporter
+        self.combatants_retriever = combatants_retriever
         self.max_rounds = max_rounds
 
     def retrieve_combatants(self):
-        return FileCombatantRetriever()\
+        return self.combatants_retriever\
             .from_path('../tasks/combat/combatants.json')\
             .retrieve()
 
@@ -62,6 +65,7 @@ class JsonArena(Arena):
 
     def __init__(self, max_rounds: int = None):
         super(JsonArena, self).__init__(battle_reporter=JsonBattleReporter(),
+                                        combatants_retriever=UrlCombatantRetriever(),
                                         max_rounds=max_rounds)
 
     def init_by_names(self, combatant_names: list):
@@ -69,7 +73,7 @@ class JsonArena(Arena):
         super().init()
 
     def retrieve_combatants(self):
-        return UrlCombatantRetriever()\
+        return self.combatants_retriever\
             .by_names(self.combatant_names)\
             .retrieve()
 
@@ -78,6 +82,7 @@ class DbJsonArena(JsonArena):
 
     def __init__(self, max_rounds: int = None):
         super(JsonArena, self).__init__(battle_reporter=DbJsonBattleReporter(),
+                                        combatants_retriever=DbUrlCombatantRetriever(),
                                         max_rounds=max_rounds)
 
     def start_battle(self) -> None:
@@ -88,6 +93,6 @@ class DbJsonArena(JsonArena):
 if __name__ == "__main__":
     arena = DbJsonArena()
     # arena.init()
-    arena.init_by_names('orc')
+    arena.init_by_names(['orc', 'dragon'])
     arena.start_battle()
     print(arena.get_summary())

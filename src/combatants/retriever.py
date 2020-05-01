@@ -111,8 +111,3 @@ class DbUrlCombatantRetriever(UrlCombatantRetriever):
 
 class CombatantNotFoundException(Exception):
     pass
-
-
-r = DbUrlCombatantRetriever()
-c = r.by_names(['dragon']).retrieve()
-pass

@@ -66,9 +66,12 @@ class DbCache:
         self._cache_combatant_by_name(round_result.defender)
         return self
 
-    def from_battle_id(self, id: int) -> 'DbCache':
-        self.battle_entity = self.battle_query.find_by_id(id)
+    def from_battle(self, battle_entity: BattleEntity) -> 'DbCache':
+        self.battle_entity = battle_entity
         return self
+
+    def get_combatant_by_name(self, name: str):
+        return self.combatant_entities[name]
 
 
 class DbJsonBattleReporter(JsonBattleReporter):
@@ -82,13 +85,20 @@ class DbJsonBattleReporter(JsonBattleReporter):
     #
 
     def save_battle(self):
-        self.db_cache.from_battle_id(BattleEntity().create().save())
+        battle_entity = BattleEntity().create()
+        battle_entity.save()
+        self.db_cache.from_battle(battle_entity)
 
     def _cache_round_result(self, round_result: 'RoundResult'):
+        super()._cache_round_result(round_result)
         self.db_cache.from_round_result(round_result)
-        attacker_id = self.db_cache.combatant_entities[round_result.attacker]
-        opponent_id = self.db_cache.combatant_entities[round_result.defender]
-        round_entity = RoundEntity
+        battle_id = self.db_cache.battle_entity.id
+        attacker_id = self.db_cache.get_combatant_by_name(round_result.attacker).id
+        opponent_id = self.db_cache.get_combatant_by_name(round_result.defender).id
+        round_entity_id = RoundEntity.create(round_number=round_result.round,
+                                          battle_id=battle_id,
+                                          attacker_id=attacker_id,
+                                          opponent_id=opponent_id).save()
 
     def get_summary(self) -> str:
         return super().get_summary()
