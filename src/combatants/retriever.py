@@ -1,6 +1,6 @@
 from combatants.model import *
 from db.query import *
-from db.mapper import FromTableMapper, ToTableMapper
+from db.mapper import FromEntityMapper, ToEntityMapper
 from util.json_operations import *
 from abc import ABC
 
@@ -90,24 +90,44 @@ class DbUrlCombatantRetriever(UrlCombatantRetriever):
     combatants_from_db: list
 
     def _by_name(self, name: str):
-        self.combatants_from_db = self.combatants_query.find_by_name(name)
+        self.combatants_from_db = self.combatants_query.find_all_by_name(name)
         if not self.combatants_from_db:
             return super()._by_name(name)
         return self
 
     def _retrieve_by_name(self) -> list:
         if self.combatants_from_db:
-            mapper = FromTableMapper()
+            mapper = FromEntityMapper()
             return list(map(lambda c: mapper.map_combatant(c), self.combatants_from_db))
         return super()._retrieve_by_name()
 
     def _cache_combatant(self, combatant: Combatant):
         filtered = list(filter(lambda c: c.name == combatant.name, self.combatants_from_db))
         if not filtered:
-            mapper = ToTableMapper()
+            mapper = ToEntityMapper()
             mapper.map_combatant(combatant).save()
         super()._cache_combatant(combatant)
 
 
 class CombatantNotFoundException(Exception):
     pass
+
+
+r = DbUrlCombatantRetriever()
+c = r.by_names(['dragon']).retrieve()
+pass
+
+# d = {'name': 'orc', 'hp': 150, 'damage': '3d6'}
+# c = Combatant(**d)
+# pass
+
+# CombatantEntity(name='a', hit_points=150, damage_pattern='a')
+# TextField('a')
+# CombatantEntity(name='a', hit_points=150, damage_pattern='a')
+
+# l = ['ax', 'by']
+# # ''.startswith()
+# filtered = list(filter(lambda w: w.startswith('a'), l))
+# for f in filtered:
+#     print(f)
+# pass

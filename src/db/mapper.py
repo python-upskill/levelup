@@ -2,13 +2,13 @@ import combatants.model
 from db import schema
 
 
-class FromTableMapper:
+class FromEntityMapper:
 
     def map_combatant(self, obj: schema.CombatantEntity) -> combatants.model.Combatant:
         return combatants.model.Combatant(obj.name, obj.hit_points, obj.damage_pattern)
 
 
-class ToTableMapper:
+class ToEntityMapper:
 
     def map_combatant(self, obj: combatants.model.Combatant) -> schema.CombatantEntity:
         return schema.CombatantEntity.create(name=obj.name,

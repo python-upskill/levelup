@@ -74,8 +74,20 @@ class JsonArena(Arena):
             .retrieve()
 
 
+class DbJsonArena(JsonArena):
+
+    def __init__(self, max_rounds: int = None):
+        super(JsonArena, self).__init__(battle_reporter=DbJsonBattleReporter(),
+                                        max_rounds=max_rounds)
+
+    def start_battle(self) -> None:
+        self.battle_reporter.save_battle()
+        super().start_battle()
+
+
 if __name__ == "__main__":
-    arena = Arena()
-    arena.init()
+    arena = DbJsonArena()
+    # arena.init()
+    arena.init_by_names('orc')
     arena.start_battle()
     print(arena.get_summary())

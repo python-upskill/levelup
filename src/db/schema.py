@@ -1,6 +1,8 @@
+import os
 from peewee import *
 
-db = SqliteDatabase('../../combat.db')
+ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
+db = SqliteDatabase(ROOT_PATH + '/../../combat.db')
 
 
 class CombatantEntity(Model):
@@ -56,3 +58,7 @@ def create_tables():
 
 
 create_tables()
+
+# print('a')
+# create_tables()
+# print('b')
