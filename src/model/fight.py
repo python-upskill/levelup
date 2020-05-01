@@ -1,6 +1,13 @@
-from peewee import *
+from peewee import (
+    BooleanField,
+    CharField,
+    IntegerField,
+    Model,
+    PrimaryKeyField,
+    SqliteDatabase,
+)
 
-db = SqliteDatabase("fight_club2.db", pragmas={"journal_mode": "wal"})
+db = SqliteDatabase("fight_club.db", pragmas={"journal_mode": "wal"})
 
 
 class Fight(Model):
@@ -14,7 +21,7 @@ class Fight(Model):
         db_table = "fight"
 
 
-def create_table():
+def create_table() -> None:
     with db:
         db.create_tables([Fight])
 

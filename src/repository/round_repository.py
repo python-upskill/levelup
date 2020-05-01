@@ -12,7 +12,8 @@ class RoundRepository:
             if key not in Round._meta.fields.keys():
                 raise AttributeError(
                     f"Parameter {key} is unknown for Round object."
-                    f" Following attributes are allowed: {', '.join(Round._meta.fields.keys())}"
+                    f" Following attributes are allowed: "
+                    f"{', '.join(Round._meta.fields.keys())}"
                 )
             if key is not None and value is not None:
                 predicates.append((getattr(Round, key) == value))

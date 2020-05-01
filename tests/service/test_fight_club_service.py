@@ -35,13 +35,19 @@ class TestFightClubService(TestCase):
             and result.victory.rounds_number <= round_max_number
         )
 
-        next_attacker = None
-        next_defender = None
+        previous_attacker = None
+        previous_defender = None
+        round_index = 0
         for round in result.rounds:
+            round_index += 1
             attacker = fighters_map[round.attacker]
             defender = fighters_map[round.defender]
-            next_attacker = defender
-            next_defender = attacker
+            if previous_attacker is not None:
+                assert attacker.name != previous_attacker.name
+            if previous_defender is not None:
+                assert defender.name != previous_defender.name
+            previous_attacker = attacker
+            previous_defender = defender
             attacker_damage_factors = attacker.damage_dice.split("d")
             attacker_damage_multiplier = int(attacker_damage_factors[0])
             attacker_damage_range = int(attacker_damage_factors[1])
@@ -53,16 +59,11 @@ class TestFightClubService(TestCase):
                 <= attacker_damage_multiplier * attacker_damage_range
                 + attacker.damage_bonus
             )
+            assert round.current_hp == round.previous_hp - round.damage
+            assert round.round_number == round_index
 
-        """assert result.victory.winner_name == "fighter1" or result.victory.winner_name == "fighter2"
-		assert result.victory.ko == False
-		assert len(result.rounds) == result.victory.rounds_number
-		last_round = result.rounds[result.victory.rounds_number - 1]
-		assert last_round.round_number == result.victory.rounds_number
-		assert last_round.attacker == result.victory.winner_name
-		if result.victory.winner_name == "fighter1":
-			assert last_round.defender == "fighter2"
-			assert last_round.damage >= 2 * 1 + 2 and last_round.damage <= 2 * 5 + 2
-		else:
-			assert last_round.defender == "fighter1"
-			assert last_round.damage >= 1 * 1 + 5 and last_round.damage <= 1 * 5 + 5"""
+            last_round = result.rounds[len(result.rounds) - 1]
+            assert last_round.round_number == result.victory.rounds_number
+
+            if result.victory.ko:
+                assert last_round.current_hp <= 0

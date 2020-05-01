@@ -1,6 +1,8 @@
+import dataclasses
 import operator
 from functools import reduce
 
+from dto.fighter_dto import FighterDto
 from model.fighter import Fighter
 
 
@@ -21,7 +23,8 @@ class FighterRepository:
             if key not in Fighter._meta.fields.keys():
                 raise AttributeError(
                     f"Parameter {key} is unknown for Fighter object."
-                    f" Following attributes are allowed: {', '.join(Fighter._meta.fields.keys())}"
+                    f" Following attributes are allowed: "
+                    f"{', '.join(Fighter._meta.fields.keys())}"
                 )
             if key is not None and value is not None:
                 predicates.append((getattr(Fighter, key) == value))

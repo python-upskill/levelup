@@ -6,7 +6,7 @@ from dto.victory_dto import VictoryDto
 
 
 class FightClubService:
-    def __calculate_damage_dice(self, damage_dice_pattern):
+    def __calculate_damage_dice(self, damage_dice_pattern) -> int:
         damage_factors = damage_dice_pattern.split("d")
         multiplier = int(damage_factors[0])
         damage_range = int(damage_factors[1])
@@ -15,20 +15,20 @@ class FightClubService:
             damage += randint(1, damage_range)
         return damage
 
-    def __calculate_damage(self, fighter):
+    def __calculate_damage(self, fighter: "FighterDto") -> int:
         damage = (
             self.__calculate_damage_dice(fighter.damage_dice) + fighter.damage_bonus
         )
         return damage
 
-    def __sum_up_fight(self, fighters, round_number):
+    def __sum_up_fight(self, fighters: list, round_number: int) -> "VictoryDto":
         fighters = sorted(fighters, key=lambda fighter: fighter.hp)
         winner = fighters[-1]
         loser = fighters[0]
         ko = loser.hp <= 0
         return VictoryDto(winner.name, round_number, ko)
 
-    def __draw_fighters_slots(self, fighters):
+    def __draw_fighters_slots(self, fighters: list) -> list:
         first_fighter = fighters[randint(0, 1)]
         fighters.remove(first_fighter)
         second_fighter = fighters[0]
@@ -58,5 +58,4 @@ class FightClubService:
             rounds_summary_list.append(round_summary)
         victory = self.__sum_up_fight(fighters, round_number)
         result = FightResultDto(rounds_summary_list, victory)
-        print(result)
         return result

@@ -6,7 +6,7 @@ from repository.fighter_repository import FighterRepository
 
 class FightersLoader:
     @classmethod
-    def load_fighter(name: str):
+    def load_fighter(cls, name: str):
         data = requests.get(f"https://www.dnd5eapi.co/api/monsters/{name}")
         json_data = data.json()
         if "error" in json_data:

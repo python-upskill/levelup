@@ -1,8 +1,15 @@
-from peewee import *
+from peewee import (
+    CharField,
+    ForeignKeyField,
+    IntegerField,
+    Model,
+    PrimaryKeyField,
+    SqliteDatabase,
+)
 
 from model.fight import Fight
 
-db = SqliteDatabase("fight_club2.db", pragmas={"journal_mode": "wal"})
+db = SqliteDatabase("fight_club.db", pragmas={"journal_mode": "wal"})
 
 
 class Round(Model):
@@ -20,7 +27,7 @@ class Round(Model):
         db_table = "round"
 
 
-def create_table():
+def create_table() -> None:
     with db:
         db.create_tables([Round])
 

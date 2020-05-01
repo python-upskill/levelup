@@ -1,6 +1,7 @@
 import operator
 from functools import reduce
 
+from dto.fight_result_dto import FightResultDto
 from model.fight import Fight
 from model.round import Round
 
@@ -31,11 +32,12 @@ class FightRepository:
             if key not in Fight._meta.fields.keys():
                 raise AttributeError(
                     f"Parameter {key} is unknown for Fight object."
-                    f" Following attributes are allowed: {', '.join(Fight._meta.fields.keys())}"
+                    f" Following attributes are allowed: "
+                    f"{', '.join(Fight._meta.fields.keys())}"
                 )
             if key is not None and value is not None:
                 predicates.append((getattr(Fight, key) == value))
-        query = Round.select()
+        query = Fight.select()
         if len(predicates):
             query = query.where(reduce(operator.and_, predicates))
         return list(query)
