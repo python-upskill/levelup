@@ -58,7 +58,3 @@ def create_tables():
 
 
 create_tables()
-
-# print('a')
-# create_tables()
-# print('b')

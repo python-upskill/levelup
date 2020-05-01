@@ -116,18 +116,3 @@ class CombatantNotFoundException(Exception):
 r = DbUrlCombatantRetriever()
 c = r.by_names(['dragon']).retrieve()
 pass
-
-# d = {'name': 'orc', 'hp': 150, 'damage': '3d6'}
-# c = Combatant(**d)
-# pass
-
-# CombatantEntity(name='a', hit_points=150, damage_pattern='a')
-# TextField('a')
-# CombatantEntity(name='a', hit_points=150, damage_pattern='a')
-
-# l = ['ax', 'by']
-# # ''.startswith()
-# filtered = list(filter(lambda w: w.startswith('a'), l))
-# for f in filtered:
-#     print(f)
-# pass

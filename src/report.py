@@ -119,11 +119,3 @@ class RoundResult:
         return (f'{self.round} {self.attacker} {self.defender} '
                 f'{self.damage} {self.previous_hp} '
                 f'{self.current_hp}')
-
-
-# d = {}
-# d.setdefault('a','v1')
-# d.setdefault('a','v2')
-# print(d)
-# print(d.setdefault('a','v1'))
-# print(d.setdefault('a','v2'))
