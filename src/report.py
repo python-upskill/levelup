@@ -93,12 +93,19 @@ class DbJsonBattleReporter(JsonBattleReporter):
         super()._cache_round_result(round_result)
         self.db_cache.from_round_result(round_result)
         battle_id = self.db_cache.battle_entity.id
-        attacker_id = self.db_cache.get_combatant_by_name(round_result.attacker).id
-        opponent_id = self.db_cache.get_combatant_by_name(round_result.defender).id
-        round_entity_id = RoundEntity.create(round_number=round_result.round,
+        attacker = self.db_cache.get_combatant_by_name(round_result.attacker).id
+        opponent = self.db_cache.get_combatant_by_name(round_result.defender).id
+        round_entity = RoundEntity.create(round_number=round_result.round,
                                           battle_id=battle_id,
-                                          attacker_id=attacker_id,
-                                          opponent_id=opponent_id).save()
+                                          attacker_id=attacker.id,
+                                          opponent_id=opponent.id)
+        round_entity.save()
+        attacker_state_entity = CombatantStateEntity.create(
+            round_id=round_entity.id,
+            combatant_id=attacker.id,
+            hp_before_attack=attacker.
+        )
+
 
     def get_summary(self) -> str:
         return super().get_summary()
