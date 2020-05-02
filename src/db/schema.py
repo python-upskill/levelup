@@ -39,20 +39,19 @@ class RoundEntity(Model):
         db_table = 'rounds'
 
 
-class CombatantStateEntity(Model):
+class DefenderStateEntity(Model):
     round_id = ForeignKeyField(RoundEntity)
-    combatant_id = ForeignKeyField(CombatantEntity)
     hp_before_attack = IntegerField()
     hp_after_attack = IntegerField()
 
     class Meta:
         database = db
-        db_table = 'combatant_states'
-        primary_key = CompositeKey('round_id', 'combatant_id')
+        db_table = 'defender_states'
+        primary_key = CompositeKey('round_id')
 
 
 def create_tables():
-    for e in [CombatantEntity, BattleEntity, RoundEntity, CombatantStateEntity]:
+    for e in [CombatantEntity, BattleEntity, RoundEntity, DefenderStateEntity]:
         if not e.table_exists():
             e.create_table()
 

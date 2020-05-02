@@ -88,11 +88,11 @@ class DbJsonArena(JsonArena):
     def start_battle(self) -> None:
         self.battle_reporter.save_battle()
         super().start_battle()
+        self.battle_reporter.update_finished_battle(self.max_rounds)
 
 
 if __name__ == "__main__":
-    arena = DbJsonArena()
-    # arena.init()
-    arena.init_by_names(['orc', 'dragon'])
+    arena = DbJsonArena(max_rounds=10)
+    arena.init_by_names(['aboleth', 'dragon'])
     arena.start_battle()
     print(arena.get_summary())

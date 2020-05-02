@@ -2,7 +2,6 @@ from util import json_operations
 from combatants.retriever import *
 from dataclasses import dataclass
 from db.query import *
-from typing import *
 
 
 @dataclass
@@ -76,44 +75,40 @@ class DbCache:
 
 class DbJsonBattleReporter(JsonBattleReporter):
     db_cache = DbCache()
-    # round_entities = List[RoundEntity]
-    # combatant_state_entities = List[CombatantStateEntity]
-    # CombatantEntity
-    # combatant_entities = {}
-
-    # def create_battle_in_db(self):
-    #
 
     def save_battle(self):
         battle_entity = BattleEntity().create()
         battle_entity.save()
         self.db_cache.from_battle(battle_entity)
 
+    def update_finished_battle(self, max_rounds: int):
+        battle_entity_id = self.db_cache.battle_entity.id
+        winner = self.db_cache.get_combatant_by_name(self.victory.winner)
+        ko = 0
+        if self.victory.ko:
+            ko = 1
+        BattleEntity.update(winner_id=winner.id, ko=ko, max_rounds=max_rounds) \
+            .where(BattleEntity.id == battle_entity_id).execute()
+
     def _cache_round_result(self, round_result: 'RoundResult'):
         super()._cache_round_result(round_result)
         self.db_cache.from_round_result(round_result)
         battle_id = self.db_cache.battle_entity.id
-        attacker = self.db_cache.get_combatant_by_name(round_result.attacker).id
-        opponent = self.db_cache.get_combatant_by_name(round_result.defender).id
+        attacker_id = self.db_cache.get_combatant_by_name(round_result.attacker).id
+        opponent_id = self.db_cache.get_combatant_by_name(round_result.defender).id
         round_entity = RoundEntity.create(round_number=round_result.round,
                                           battle_id=battle_id,
-                                          attacker_id=attacker.id,
-                                          opponent_id=opponent.id)
+                                          attacker_id=attacker_id,
+                                          opponent_id=opponent_id)
         round_entity.save()
-        attacker_state_entity = CombatantStateEntity.create(
+        DefenderStateEntity.create(
             round_id=round_entity.id,
-            combatant_id=attacker.id,
-            hp_before_attack=attacker.
-        )
-
+            hp_before_attack=round_result.previous_hp,
+            hp_after_attack=round_result.current_hp
+        ).save()
 
     def get_summary(self) -> str:
         return super().get_summary()
-
-    # def _save_round_result(self, round_result: 'RoundResult'):
-        # CombatantQuery().
-        # mapper = ToEntityMapper()
-        # mapper.m
 
 
 class RoundResult:
