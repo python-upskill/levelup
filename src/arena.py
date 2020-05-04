@@ -28,9 +28,9 @@ class Arena:
         self.opponent = combatants[0]
 
     def get_winner(self) -> Combatant:
-        if self.attacker.is_lost():
+        if self.attacker.is_lost:
             return self.opponent
-        if self.opponent.is_lost():
+        if self.opponent.is_lost:
             return self.attacker
         return None
 

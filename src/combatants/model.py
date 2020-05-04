@@ -46,5 +46,6 @@ class Combatant(object):
         self.damage = self._random_damage()
         other.hp_after_attack -= self.damage
 
+    @property
     def is_lost(self) -> bool:
         return self.hp_after_attack <= 0
